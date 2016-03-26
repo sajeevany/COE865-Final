@@ -8,7 +8,8 @@ import java.util.Map;
 public class App {
 
 	private final int helloProtocolPort = 10090;
-	private String myUniqueID;
+	private String myUniqueID = null;
+	private String fileNames[];
 	
 	private Map<InetAddress, DatagramSocket> ipSocketMap = new HashMap<InetAddress, DatagramSocket>();
 	
@@ -28,8 +29,7 @@ public class App {
 		}
 		
 		this.myUniqueID = uniqueID;
-		
-	//file setups
+		this.fileNames = myFilesList;
 
 	}
 	
