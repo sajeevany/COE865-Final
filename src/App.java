@@ -1,4 +1,3 @@
-package encryption;
 
 public class App {
 
