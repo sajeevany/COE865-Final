@@ -23,8 +23,12 @@ public class App {
 				ipSocketMap.put(InetAddress.getByName(IP[i]) , new DatagramSocket(sockets[i]));
 			}
 			
-		} catch (SocketException | UnknownHostException e) {
-			// TODO Auto-generated catch block
+		} catch (SocketException e) {
+			
+			e.printStackTrace();
+			
+		} catch (UnknownHostException e)
+		{
 			e.printStackTrace();
 		}
 		
