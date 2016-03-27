@@ -1,30 +1,33 @@
 package project865;
 import java.io.BufferedReader;
-import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 public class App {
 
-	private final int helloProtocolPort = 10090;
 	private String myUniqueID = null;
-	private String fileNames[];
+	private String resourceNames[];
 	private HelloManager hManager;
-	private DatagramSocket myHelloSocket;
-	private ArrayList<InetAddress> targetIPs;
-	private Map<InetAddress, DatagramSocket> ipSocketMap = new HashMap<InetAddress, DatagramSocket>();
+	private Map<InetAddress, DatagramSocket> myIPSocketMap = new HashMap<InetAddress, DatagramSocket>();
+	private ArrayList<InetAddress> targetMachineIPs = new ArrayList<InetAddress>();
 
-	public App(String[] IP, int[] sockets, String[] myFilesList, String uniqueID, String configFileName) throws SocketException {
+	public App(String[] myIPs, int[] myQuerySockets, String[] myResourceList, String uniqueID, String configFileName) throws IOException {
 		try {
 
-			for (int i = 0; i < sockets.length; i++) {
-				ipSocketMap.put(InetAddress.getByName(IP[i]), new DatagramSocket(sockets[i]));
+			for (int i = 0; i < myQuerySockets.length; i++) {
+				myIPSocketMap.put(InetAddress.getByName(myIPs[i]), new DatagramSocket(myQuerySockets[i]));
 			}
 
 		} catch (SocketException e) {
@@ -36,19 +39,42 @@ public class App {
 		}
 
 		this.myUniqueID = uniqueID;
-		this.fileNames = myFilesList;
-		this.myHelloSocket = new DatagramSocket(helloProtocolPort);
+		this.resourceNames = myResourceList;
 		
-		try{
-			BufferedReader br = new BufferedReader(new FileReader(configFileName));
-			//populate target IPs
-			
-		}catch(Exception e)
+		//determine network. Network mask assumption of /24
+		ArrayList<String> myNetwork = new ArrayList<String>();
+		List<String> myIPList =  Arrays.asList(myIPs);
+
+		for (String i : myIPs)
 		{
-			
+			myNetwork.add(getNetwork(i));
 		}
 		
-		this.hManager = new HelloManager(ipSocketMap, this.myUniqueID, this.targetIPs);
+		//Read file and find target machines/hosts within my networks
+		BufferedReader br = null;
+		try {
+			br = new BufferedReader(new FileReader(configFileName));
+			
+			String ipAddr = br.readLine();
+			while(ipAddr != null)
+			{
+				String network = getNetwork(ipAddr);
+				//If the IP is within my network and the IP is not my own
+				if (myNetwork.contains(network) && !myIPList.contains(ipAddr))
+				{
+					targetMachineIPs.add(InetAddress.getByName(ipAddr));
+				}
+				ipAddr = br.readLine();
+			}
+			
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}finally
+		{
+			br.close();
+		}	
+		
+		this.hManager = new HelloManager(this.myUniqueID, targetMachineIPs);
 		this.hManager.runManager();
 	}
 
@@ -57,9 +83,22 @@ public class App {
 		
 	}
 		
-	public static void main(String[] args) throws SocketException {
+	public static void main(String[] args) throws IOException {
 		
-		App client1 = new App(new String[]{"192.168.0.2", "192.168.1.2"}, new int[] {10901, 12345}, new String[] {"groupNames.txt", "myFile.txt"}, "R1", "config");
+		App client1 = new App(new String[]{"10.1.1.1", "10.1.1.3"}, new int[] {10901, 12345}, new String[] {"groupNames.txt", "myFile.txt"}, "R1", "config");
 	}
 
+	public static String getNetwork(String IP)
+	{
+		StringTokenizer sTok = new StringTokenizer(IP,".");
+		StringBuilder sBuild = new StringBuilder(); 
+		
+		for (int j = 0; j < sTok.countTokens(); j++ )
+		{
+			sBuild.append(sTok.nextToken() + ".");
+		}
+		sBuild.append(sTok.nextToken() + ".0");
+		
+		return sBuild.toString();
+	}
 }
