@@ -9,31 +9,37 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.TimerTask;
 
 public class HelloManager{
 	
 	private String myUniqueID = null;
-	private ArrayList<DatagramSocket> myHelloSockets;
+	//private ArrayList<DatagramSocket> myHelloSockets;
+	Map<InetAddress, DatagramSocket> ipSocketMap;
+	ArrayList<InetAddress> targetIPs;
 	ArrayList<HelloReceiver> hReceiver = new ArrayList<HelloReceiver>();
 	ArrayList<HelloSender> hSender = new ArrayList<HelloSender>();
 	
-	public HelloManager(ArrayList<DatagramSocket> helloSockets, String uniqueID)
+	public HelloManager(Map<InetAddress, DatagramSocket> ipSocketMap, String uniqueID, ArrayList<InetAddress> targetIPs)
 	{
 		//initialize default values that should not change
-		this.myHelloSockets = helloSockets;
+		//this.myHelloSockets = helloSockets;
+		this.ipSocketMap = ipSocketMap;
 		this.myUniqueID = uniqueID;
+		this.targetIPs = targetIPs;
 		
 		//initialize routing table
 		//TODO add routing table
 		
 		//Each port should have a sender and receiver attached to it
-		for( DatagramSocket dSocket : myHelloSockets)
+		for(Map.Entry<InetAddress, DatagramSocket> t: ipSocketMap.entrySet())
 		{
-			hReceiver.add(new HelloReceiver(dSocket));
-			hSender.add(new HelloSender(dSocket));
+			hReceiver.add(new HelloReceiver(t.getKey(), t.getValue()));
+			hSender.add(new HelloSender(t.getKey()));
 		}
 		
 	}
@@ -121,7 +127,7 @@ class HelloReceiver implements Runnable
 {
 	DatagramSocket mySocket = null;
 	
-	public HelloReceiver(DatagramSocket mySocket) {
+	public HelloReceiver(InetAddress myIPAddr, DatagramSocket myListeningSocket) {
 		this.mySocket = mySocket;
 	}
 	
@@ -137,10 +143,12 @@ class HelloReceiver implements Runnable
 
 class HelloSender implements Runnable
 {
-	DatagramSocket mySocket = null;
+	InetAddress myIPAddr;
+	DatagramSocket socketToSendFrom;
 	
-	public HelloSender(DatagramSocket mySocket) {
-		this.mySocket = mySocket;
+	public HelloSender(InetAddress myIPAddr) {
+		this.myIPAddr = myIPAddr;
+		
 	}
 	
 	//TODO Complete
@@ -157,7 +165,7 @@ class HelloSender implements Runnable
 		};
 		
 		//Sender code here
-		System.out.println("Hello Sender started on port " +  mySocket.getLocalPort());
+		//System.out.println("Hello Sender started on port " +  mySocket.getLocalPort());
 		
 	}
 }
