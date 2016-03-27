@@ -10,15 +10,48 @@ import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.TimerTask;
 
-public class HelloManager implements Runnable{
+public class HelloManager{
 	
-	@Override
-	public void run() {
-		// TODO Auto-generated method stub
+	private String myUniqueID = null;
+	private ArrayList<DatagramSocket> myHelloSockets;
+	ArrayList<HelloReceiver> hReceiver = new ArrayList<HelloReceiver>();
+	ArrayList<HelloSender> hSender = new ArrayList<HelloSender>();
+	
+	public HelloManager(ArrayList<DatagramSocket> helloSockets, String uniqueID)
+	{
+		//initialize default values that should not change
+		this.myHelloSockets = helloSockets;
+		this.myUniqueID = uniqueID;
+		
+		//initialize routing table
+		//TODO add routing table
+		
+		//Each port should have a sender and receiver attached to it
+		for( DatagramSocket dSocket : myHelloSockets)
+		{
+			hReceiver.add(new HelloReceiver(dSocket));
+			hSender.add(new HelloSender(dSocket));
+		}
 		
 	}
 	
+	//start hello receiver and sender threads
+	public void runManager()
+	{
+		for (HelloReceiver hRecv: hReceiver)
+		{
+			hRecv.run();
+		}
+		
+		for (HelloSender hSend: hSender)
+		{
+			hSend.run();
+		}
+	}
+		
 	public void sendHelloPacket(DatagramSocket dSocket, HelloPacket helloPacket)
 	{
 		ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
@@ -81,6 +114,50 @@ public class HelloManager implements Runnable{
 		return hPacket;
 		
 	}
-
 	
+}
+
+class HelloReceiver implements Runnable
+{
+	DatagramSocket mySocket = null;
+	
+	public HelloReceiver(DatagramSocket mySocket) {
+		this.mySocket = mySocket;
+	}
+	
+	//TODO Complete
+	@Override
+	public void run() {
+		
+		//Receiver code here
+		System.out.println("Hello Receiver started on port " +  mySocket.getLocalPort());
+		
+	}
+}
+
+class HelloSender implements Runnable
+{
+	DatagramSocket mySocket = null;
+	
+	public HelloSender(DatagramSocket mySocket) {
+		this.mySocket = mySocket;
+	}
+	
+	//TODO Complete
+	@Override
+	public void run() {
+		
+		TimerTask sendHello = new TimerTask(){
+
+			@Override
+			public void run() {
+				//sendHelloPacket();
+			}
+			
+		};
+		
+		//Sender code here
+		System.out.println("Hello Sender started on port " +  mySocket.getLocalPort());
+		
+	}
 }

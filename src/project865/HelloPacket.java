@@ -1,13 +1,10 @@
 package project865;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class HelloPacket implements Serializable {
@@ -23,9 +20,35 @@ public class HelloPacket implements Serializable {
 
 	public HelloPacket(String uniqueID,Map<String, String> uniqueIDResourceMap, InetAddress myAddresses[], DatagramSocket mySockets[])
 	{
+		if (myAddresses.length != mySockets.length)
+		{
+			throw new IllegalArgumentException("Number of addresses and sockets do not match");
+		}
+		
 		this.myUniqueID = uniqueID;
 		this.uniqueIDResourceMap = uniqueIDResourceMap;
 		this.myAddresses = myAddresses;
 		this.mySockets = mySockets;
 	}
+	
+	public String toString()
+	{
+		StringBuilder sB = new StringBuilder("myUniqueID: " + myUniqueID + "\n");
+		
+		for (int i = 0; i < myAddresses.length; i++)
+		{
+			sB.append("InetAddr" + i + ": "  + myAddresses[i].getHostAddress() + "\n");
+			sB.append("DatagramSockets" + i + ": "  + mySockets[i].getLocalPort() + "\n");
+		}
+				
+		sB.append("\nResource List\n");
+		
+		for(Map.Entry<String, String> entrySet : uniqueIDResourceMap.entrySet())
+		{
+			sB.append("key: " + entrySet.getKey() + " value: " + entrySet.getValue() + "\n");
+		}
+		
+		return sB.toString();
+	}
 }
+
