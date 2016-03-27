@@ -12,18 +12,18 @@ public class HelloPacket implements Serializable {
 	private String myUniqueID = null;
 	// uniqueID, resource
 	private Map<String, String> uniqueIDResourceMap = new HashMap<String, String>();
-	private InetAddress myAddresses[];
-	private DatagramSocket mySockets[];
+	private InetAddress myAddresses;
+	private DatagramSocket mySockets;
 
 	public static final int sendInterval = 10;
 	public static final int timeout = 3 * sendInterval;
 
-	public HelloPacket(String uniqueID,Map<String, String> uniqueIDResourceMap, InetAddress myAddresses[], DatagramSocket mySockets[])
+	public HelloPacket(String uniqueID,Map<String, String> uniqueIDResourceMap, InetAddress myAddresses, DatagramSocket mySockets)
 	{
-		if (myAddresses.length != mySockets.length)
-		{
-			throw new IllegalArgumentException("Number of addresses and sockets do not match");
-		}
+		//if (myAddresses.length != mySockets.length)
+		//{
+		//	throw new IllegalArgumentException("Number of addresses and sockets do not match");
+		//}
 		
 		this.myUniqueID = uniqueID;
 		this.uniqueIDResourceMap = uniqueIDResourceMap;
@@ -35,11 +35,11 @@ public class HelloPacket implements Serializable {
 	{
 		StringBuilder sB = new StringBuilder("myUniqueID: " + myUniqueID + "\n");
 		
-		for (int i = 0; i < myAddresses.length; i++)
-		{
-			sB.append("InetAddr" + i + ": "  + myAddresses[i].getHostAddress() + "\n");
-			sB.append("DatagramSockets" + i + ": "  + mySockets[i].getLocalPort() + "\n");
-		}
+		//for (int i = 0; i < myAddresses.length; i++)
+		//{
+			sB.append("InetAddr" + ": "  + myAddresses.getHostAddress() + "\n");
+			sB.append("DatagramSockets" + ": "  + mySockets.getLocalPort() + "\n");
+		//}
 				
 		sB.append("\nResource List\n");
 		
