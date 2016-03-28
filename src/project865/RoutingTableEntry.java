@@ -4,9 +4,12 @@
  */
 package project865;
 
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -14,30 +17,30 @@ import java.util.HashMap;
  */
 public class RoutingTableEntry {
 
-	private InetAddress nextHop;
-	private Socket nextHopSocket;
+	private String nextHop;
+	private int nextHopSocket;
 	private String uniqueID;
-	private HashMap<String, String> neighbourAndResource = new HashMap<String, String>();
+	private HashMap<String, ArrayList<String>> neighbourAndResource = new HashMap<String, ArrayList<String>>();
 
-	public RoutingTableEntry(InetAddress nextHop, Socket nextHopSocket, String uniqueID) {
+	public RoutingTableEntry(String nextHop, int nextHopSocket, String uniqueID, HashMap<String, String> neighbourResourceMap) {
 		this.nextHop = nextHop;
 		this.nextHopSocket = nextHopSocket;
 		this.uniqueID = uniqueID;
 	}
 
-	public InetAddress getNextHop() {
+	public String getNextHop() {
 		return nextHop;
 	}
 
-	public void setNextHop(InetAddress nextHop) {
+	public void setNextHop(String nextHop) {
 		this.nextHop = nextHop;
 	}
 
-	public Socket getNextHopSocket() {
+	public int getNextHopSocket() {
 		return nextHopSocket;
 	}
 
-	public void setNextHopSocket(Socket nextHopSocket) {
+	public void setNextHopSocket(int nextHopSocket) {
 		this.nextHopSocket = nextHopSocket;
 	}
 
@@ -49,28 +52,25 @@ public class RoutingTableEntry {
 		this.uniqueID = uniqueID;
 	}
 
-	public HashMap<String, String> getNeighbourAndResource() {
-		return neighbourAndResource;
-	}
-
-	public void setNeighbourAndResource(String id, String resource) {
-		this.neighbourAndResource.put(id, resource); // Order is crucial.
-	}
-
-	public HashMap<String, String> getNeibourAndResource() { // Just in case
+	public HashMap<String, ArrayList<String>> getNeighbourAndResource() {
 		return this.neighbourAndResource;
 	}
+        
+        /*
+         *   Returns the uniqueID of the client with the associated resource.
+         */
+	public String hasResource(String resource) { 
+            String uniqueID = "NaN";
 
-	public String hasResource(String resource) { // Returns the uniqueID of the
-													// client with the
-													// associated resource.
-		String id = "";
+            for (Map.Entry<String, ArrayList<String>> nR : this.getNeighbourAndResource().entrySet())
+            {
+                if (nR.getValue().contains(resource))
+                {
+                    return nR.getKey();
+                }
+            }
 
-		if (this.neighbourAndResource.containsValue(resource)) {
-			id = this.neighbourAndResource.get(resource);
-		}
-
-		return id;
+            return uniqueID;
 	}
 
 	@Override

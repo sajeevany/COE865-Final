@@ -23,15 +23,14 @@ public class HelloManager{
     private String myUniqueID = null;
     private Map<InetAddress, DatagramSocket> myIPSocketMap = null;
     public static final int helloProtocolPort = 10090;
-    ArrayList<InetAddress> targetIPs;      
-    ArrayList<HelloReceiver> hReceiver = new ArrayList<HelloReceiver>();
-    //ArrayList<HelloSender> hSender = new ArrayList<HelloSender>();
-    HelloSender myHSenderManager = null;
-    HelloReceiver myHRecvManager = null;
+    private ArrayList<InetAddress> targetIPs;      
+    private ArrayList<HelloReceiver> hReceiver = new ArrayList<HelloReceiver>();
+    private HelloSender myHSenderManager = null;
+    private  HelloReceiver myHRecvManager = null;
         
         
 	
-	public HelloManager(String uniqueID, ArrayList<InetAddress> targetIPs, Map<InetAddress, DatagramSocket> myIPSocketMap) throws SocketException
+	public HelloManager(String uniqueID, ArrayList<InetAddress> targetIPs, Map<InetAddress, DatagramSocket> myIPSocketMap, String[] myResources) throws SocketException
 	{
             //initialize default values that should not change
             this.myUniqueID = uniqueID;
@@ -39,7 +38,17 @@ public class HelloManager{
             this.myIPSocketMap = myIPSocketMap;
 
             //initialize routing table
-            //TODO add routing table
+            HashMap<String, String> nResMap = new HashMap<String, String>();
+            for (String res : myResources)
+            {
+                nResMap.put(uniqueID, res);
+            }
+            //initialize routing table with local values
+            for (Map.Entry<InetAddress,DatagramSocket> sockMap : myIPSocketMap.entrySet())
+            {
+                RoutingTable.getRoutingTableInstance().addRoute(new RoutingTableEntry(sockMap.getKey().getHostAddress(), sockMap.getValue().getLocalPort(), uniqueID, nResMap));
+            }
+            
 
             //Attach a receiver to listen to the default hello port
             myHSenderManager = new HelloSender(targetIPs, this.myUniqueID, this.myIPSocketMap);
@@ -164,10 +173,17 @@ class HelloSender
                 
                 //in  actuallity we are going to send our entire routing table's resource map
                 //for testing 
-                HashMap<String, String> neighbourAndResource = new HashMap<String, String>();
-                neighbourAndResource.put("R5", "my exam");
+                //HashMap<String, String> neighbourAndResource = new HashMap<String, String>();
+                //neighbourAndResource.put("R5", "my exam");
+                ArrayList<RoutingTableEntry> routeList = RoutingTable.getRoutingTableInstance().getRoutes();
+                HashMap<String,ArrayList<String>> netResourceList = new HashMap<String,ArrayList<String>>();
                 
-                HelloManager.sendHelloPacket(targetSocket.getLocalPort(), targetIPAddr.getHostAddress(), new HelloPacket(myUniqueID, neighbourAndResource, queryIP, myQueryPort));
+                for (RoutingTableEntry route: routeList)
+                {
+                    netResourceList.putAll(route.getNeighbourAndResource());
+                }
+                
+                HelloManager.sendHelloPacket(targetSocket.getLocalPort(), targetIPAddr.getHostAddress(), new HelloPacket(myUniqueID, netResourceList, queryIP, myQueryPort));
                 System.out.println("sent");
             };
         };
@@ -221,43 +237,28 @@ class HelloSender
 	
 }
 
-class HelloReceiver {
-
+class HelloReceiver 
+{
     byte[] buffer = new byte[65508];
-    DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
     Runnable hReceiver = null;
-
-    private Runnable hRecvRunnable(final DatagramSocket localSocket) {
-        Runnable hSend = new Runnable() {
-            @Override
-            public void run() {
-                System.out.println("listening on " + localSocket.getLocalAddress() + " on local port " + localSocket.getLocalPort());
-                System.out.println("listening to " + localSocket.getRemoteSocketAddress());
-                while (true) {
-                    packet.setLength(65508);
-                    try {
-                        localSocket.receive(packet);
-                        ByteArrayInputStream baos = new ByteArrayInputStream(buffer);
-                        ObjectInputStream oos = new ObjectInputStream(baos);
-                        HelloPacket helloReceived;
-                        try {
-                            helloReceived = (HelloPacket) oos.readObject();
-                            System.out.println(helloReceived.toString());
-
-                        } catch (ClassNotFoundException ex) {
-                            Logger.getLogger(HelloReceiver.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    } catch (IOException ex) {
-                        Logger.getLogger(HelloReceiver.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-
+    
+    private Runnable hRecvRunnable(final DatagramSocket localSocket)
+    {
+        Runnable hSend = new Runnable()
+        {
+            public void run()
+            {
+                while(true)
+                {
+                    System.out.println("listening on " + localSocket.getLocalAddress() + " on local port " + localSocket.getLocalPort());
+                    System.out.println("listening to " + localSocket.getRemoteSocketAddress());
+               
                 }
-            }
-        ;
+            };
         };
 
         return hSend;
-    }
+    };
 
     public HelloReceiver(DatagramSocket localSocket) throws SocketException {
         hReceiver = hRecvRunnable(localSocket);

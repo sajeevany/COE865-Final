@@ -1,7 +1,6 @@
 package project865;
 import java.io.Serializable;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,14 +8,14 @@ public class HelloPacket implements Serializable {
 
 	private String myUniqueID = null;
 	// uniqueID, resource
-	private Map<String, String> uniqueIDResourceMap = new HashMap<String, String>();
+	private Map<String, ArrayList<String>> uniqueIDResourceMap = new HashMap<String,  ArrayList<String>>();
 	private String myAddress;
 	private int mySocket;
 
 	public static final int sendInterval = 10;
 	public static final int timeout = 3 * sendInterval;
 
-	public HelloPacket(String uniqueID,Map<String, String> uniqueIDResourceMap, String myAddress, int mySocket)
+	public HelloPacket(String uniqueID,HashMap<String, ArrayList<String>> uniqueIDResourceMap, String myAddress, int mySocket)
 	{	
 		this.myUniqueID = uniqueID;
 		this.uniqueIDResourceMap = uniqueIDResourceMap;
@@ -33,9 +32,12 @@ public class HelloPacket implements Serializable {
 				
 		sB.append("\nResource List\n");
 		
-		for(Map.Entry<String, String> entrySet : uniqueIDResourceMap.entrySet())
+		for(Map.Entry<String, ArrayList<String>> entrySet : uniqueIDResourceMap.entrySet())
 		{
-			sB.append("key: " + entrySet.getKey() + " value: " + entrySet.getValue() + "\n");
+                    for(String resource : entrySet.getValue())
+                    {
+                        sB.append("key: " + entrySet.getKey() + " value: " + resource + "\n");
+                    }
 		}
 		
 		return sB.toString();

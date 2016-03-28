@@ -60,4 +60,18 @@ public class RoutingTable {
         }
     }
     
+    public RoutingTableEntry getRoute(String uniqueID)
+    {
+        for (RoutingTableEntry rte : routingEntries)
+        {
+            if (rte.getUniqueID().equals(uniqueID))
+            {
+                return rte;
+            }
+
+        }
+        
+        return null;
+    }
+    
 }

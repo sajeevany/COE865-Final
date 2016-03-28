@@ -78,7 +78,7 @@ public class App {
                 //needs port
                 
                 
-		this.hManager = new HelloManager(this.myUniqueID, targetMachineIPs, this.myIPSocketMap);
+		this.hManager = new HelloManager(this.myUniqueID, targetMachineIPs, this.myIPSocketMap, myResourceList);
 		this.hManager.runManager();
 	}
 		
