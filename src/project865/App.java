@@ -24,11 +24,11 @@ public class App {
 	private ArrayList<InetAddress> targetMachineIPs = new ArrayList<InetAddress>();
 
 	public App(String[] myIPs, int[] myQuerySockets, String[] myResourceList, String uniqueID, String configFileName) throws IOException {
-		try {
+            try {
 
-			for (int i = 0; i < myQuerySockets.length; i++) {
-				myIPSocketMap.put(InetAddress.getByName(myIPs[i]), new DatagramSocket(myQuerySockets[i]));
-			}
+                for (int i = 0; i < myQuerySockets.length; i++) {
+                        myIPSocketMap.put(InetAddress.getByName(myIPs[i]), new DatagramSocket(myQuerySockets[i]));
+                }
 
 		} catch (SocketException e) {
 
@@ -74,7 +74,11 @@ public class App {
                     br.close();
 		}	
 		
-		this.hManager = new HelloManager(this.myUniqueID, targetMachineIPs);
+                //needs resource list unique + reousrce
+                //needs port
+                
+                
+		this.hManager = new HelloManager(this.myUniqueID, targetMachineIPs, this.myIPSocketMap);
 		this.hManager.runManager();
 	}
 		

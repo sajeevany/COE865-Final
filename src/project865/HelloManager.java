@@ -12,51 +12,49 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class HelloManager{
 	
-	private String myUniqueID = null;
-	public static final int helloProtocolPort = 10090;
-	ArrayList<InetAddress> targetIPs;      
-	ArrayList<HelloReceiver> hReceiver = new ArrayList<HelloReceiver>();
-	//ArrayList<HelloSender> hSender = new ArrayList<HelloSender>();
+    private String myUniqueID = null;
+    private Map<InetAddress, DatagramSocket> myIPSocketMap = null;
+    public static final int helloProtocolPort = 10090;
+    ArrayList<InetAddress> targetIPs;      
+    ArrayList<HelloReceiver> hReceiver = new ArrayList<HelloReceiver>();
+    //ArrayList<HelloSender> hSender = new ArrayList<HelloSender>();
     HelloSender myHSenderManager = null;
     HelloReceiver myHRecvManager = null;
         
         
 	
-	public HelloManager(String uniqueID, ArrayList<InetAddress> targetIPs) throws SocketException
+	public HelloManager(String uniqueID, ArrayList<InetAddress> targetIPs, Map<InetAddress, DatagramSocket> myIPSocketMap) throws SocketException
 	{
-		//initialize default values that should not change
-		this.myUniqueID = uniqueID;
-		this.targetIPs = targetIPs;
-		
-		//initialize routing table
-		//TODO add routing table
-		
-		//Attach a receiver to listen to the default hello port
-        myHSenderManager = new HelloSender(targetIPs);
+            //initialize default values that should not change
+            this.myUniqueID = uniqueID;
+            this.targetIPs = targetIPs;
+            this.myIPSocketMap = myIPSocketMap;
+
+            //initialize routing table
+            //TODO add routing table
+
+            //Attach a receiver to listen to the default hello port
+            myHSenderManager = new HelloSender(targetIPs, this.myUniqueID, this.myIPSocketMap);
 		//require single hello receiver for listening
-        myHRecvManager = new HelloReceiver(new DatagramSocket(this.helloProtocolPort));
+            myHRecvManager = new HelloReceiver(new DatagramSocket(this.helloProtocolPort));
 
 		/*hReceiver.add(new HelloReceiver(helloProtocolPort));*/     
 	}
         
-        protected void helloSender()
-        {
-            
-        }
-	
+     	
 	//start hello receiver and sender threads
 	public void runManager()
 	{
         myHSenderManager.startHSenderThreads();
-        myHRecvManager.startHRecvThread();
+       // myHRecvManager.startHRecvThread();
 	}
 		
 	public void sendHelloPacket(DatagramSocket dSocket, HelloPacket helloPacket)
@@ -150,30 +148,63 @@ public class HelloManager{
 
 class HelloSender
 {
+    final String myUID = null;
     byte[] buffer = new byte[65508];
     private ScheduledExecutorService scheduler = null;
     ArrayList<Runnable> hSendList = new ArrayList<Runnable>();
 
-    private Runnable hSendRunnable(final InetAddress targetIPAddr, final DatagramSocket localSocket)
+    private Runnable hSendRunnable(final InetAddress targetIPAddr, final DatagramSocket targetSocket, final String myUniqueID, final String queryIP, final int myQueryPort)
     {
         Runnable hSend = new Runnable()
         {
             public void run()
             {
-                System.out.println("sending to " + targetIPAddr.getHostAddress() + " on local port " + localSocket.getLocalPort());
-                System.out.println("my ip is " + localSocket.getLocalAddress());
+                System.out.println("sending to " + targetIPAddr.getHostAddress() + " on local port " + targetSocket.getLocalPort());
+                System.out.println("my ip is " + targetSocket.getLocalAddress());
+                
+                //in  actuallity we are going to send our entire routing table's resource map
+                //for testing 
+                HashMap<String, String> neighbourAndResource = new HashMap<String, String>();
+                neighbourAndResource.put("R5", "my exam");
+                
+                HelloManager.sendHelloPacket(targetSocket.getLocalPort(), targetIPAddr.getHostAddress(), new HelloPacket(myUniqueID, neighbourAndResource, queryIP, myQueryPort));
+                System.out.println("sent");
             };
         };
 
         return hSend;
     };
 
-    public HelloSender(ArrayList<InetAddress> targetIPs) throws SocketException {
+    public HelloSender(ArrayList<InetAddress> targetIPs, String myUniqueID, Map<InetAddress, DatagramSocket> myIPSocketMap) throws SocketException {
 
+        int iQueryPort = 0;
+        String queryIP = null;
         scheduler = Executors.newScheduledThreadPool(targetIPs.size() + 1);
+               
         for (InetAddress t : targetIPs)
         {
-            hSendList.add(hSendRunnable(t, new DatagramSocket()));
+            for (Map.Entry<InetAddress,DatagramSocket> sockMap : myIPSocketMap.entrySet())
+            {
+                //If currect socket map's ip is part of the same network as the target ip, set iQuert port
+                if (App.getNetwork(sockMap.getKey().getHostAddress()).equals(App.getNetwork(t.getHostAddress())))
+                {
+                    iQueryPort = sockMap.getValue().getLocalPort();
+                    queryIP = sockMap.getKey().getHostAddress();
+                    break;
+                }
+            }
+            
+            if (queryIP == null)
+            {
+                throw new IllegalArgumentException("Unable to match target IP " + t + "with iQuery port");
+            }
+            else
+            {
+                hSendList.add(hSendRunnable(t, new DatagramSocket(), myUniqueID, queryIP, iQueryPort));
+                queryIP = null;
+            }
+            
+            
         }
         System.out.print("I have " + targetIPs.size() + " targets");
     }
@@ -205,7 +236,7 @@ class HelloReceiver
                 {
                     System.out.println("listening on " + localSocket.getLocalAddress() + " on local port " + localSocket.getLocalPort());
                     System.out.println("listening to " + localSocket.getRemoteSocketAddress());
-                    HelloManager.sendHelloPacket(targetSocket.getLocalPort(), targetIPAddr.getHostAddress(), new HelloPacket(HelloManager.myUniqueID, map, targetIPAddr, targetSocket));
+               
                 }
             };
         };

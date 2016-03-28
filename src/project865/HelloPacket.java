@@ -16,12 +16,12 @@ public class HelloPacket implements Serializable {
 	public static final int sendInterval = 10;
 	public static final int timeout = 3 * sendInterval;
 
-	public HelloPacket(String uniqueID,Map<String, String> uniqueIDResourceMap, InetAddress myAddress, DatagramSocket mySocket)
+	public HelloPacket(String uniqueID,Map<String, String> uniqueIDResourceMap, String myAddress, int mySocket)
 	{	
 		this.myUniqueID = uniqueID;
 		this.uniqueIDResourceMap = uniqueIDResourceMap;
-		this.myAddress = myAddress.getHostAddress();
-		this.mySocket = mySocket.getPort();
+		this.myAddress = myAddress;
+		this.mySocket = mySocket;
 	}
 	
 	public String toString()

@@ -14,7 +14,7 @@ public class RoutingTable {
     
     private RoutingTable(){};
     
-    public RoutingTable getRoutingTableInstance()
+    public static RoutingTable getRoutingTableInstance()
     {
         if (routingTableInstance == null)
         {
