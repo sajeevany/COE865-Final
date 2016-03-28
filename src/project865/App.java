@@ -68,24 +68,19 @@ public class App {
 			}
 			
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+                    e.printStackTrace();
 		}finally
 		{
-			br.close();
+                    br.close();
 		}	
 		
 		this.hManager = new HelloManager(this.myUniqueID, targetMachineIPs);
 		this.hManager.runManager();
 	}
-
-	public void startHelloManager()
-	{
-		
-	}
 		
 	public static void main(String[] args) throws IOException {
 		
-		App client1 = new App(new String[]{"10.1.1.1", "10.1.1.3"}, new int[] {10901, 12345}, new String[] {"groupNames.txt", "myFile.txt"}, "R1", "config");
+		App client1 = new App(new String[]{"172.16.57.8", "10.1.1.3"}, new int[] {10901, 12345}, new String[] {"groupNames.txt", "myFile.txt"}, "R1", "config");
 	}
 
 	public static String getNetwork(String IP)
@@ -93,6 +88,8 @@ public class App {
 		StringTokenizer sTok = new StringTokenizer(IP,".");
 		StringBuilder sBuild = new StringBuilder(); 
 		
+                System.out.println(IP + " getNetwork");
+                
 		for (int j = 0; j < sTok.countTokens(); j++ )
 		{
 			sBuild.append(sTok.nextToken() + ".");

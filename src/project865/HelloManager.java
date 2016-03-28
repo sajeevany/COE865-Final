@@ -12,16 +12,23 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class HelloManager{
 	
 	private String myUniqueID = null;
 	public static final int helloProtocolPort = 10090;
-	ArrayList<InetAddress> targetIPs;
+	ArrayList<InetAddress> targetIPs;      
 	ArrayList<HelloReceiver> hReceiver = new ArrayList<HelloReceiver>();
-	ArrayList<HelloSender> hSender = new ArrayList<HelloSender>();
+	//ArrayList<HelloSender> hSender = new ArrayList<HelloSender>();
+    HelloSender myHSenderManager = null;
+    HelloReceiver myHRecvManager = null;
+        
+        
 	
 	public HelloManager(String uniqueID, ArrayList<InetAddress> targetIPs) throws SocketException
 	{
@@ -33,26 +40,23 @@ public class HelloManager{
 		//TODO add routing table
 		
 		//Attach a receiver to listen to the default hello port
-		for(InetAddress t: targetIPs)
-		{
-			hSender.add(new HelloSender(t));
-		}
+        myHSenderManager = new HelloSender(targetIPs);
 		//require single hello receiver for listening
-		hReceiver.add(new HelloReceiver(helloProtocolPort));
+        myHRecvManager = new HelloReceiver(new DatagramSocket(this.helloProtocolPort));
+
+		/*hReceiver.add(new HelloReceiver(helloProtocolPort));*/     
 	}
+        
+        protected void helloSender()
+        {
+            
+        }
 	
 	//start hello receiver and sender threads
 	public void runManager()
 	{
-		for (HelloReceiver hRecv: hReceiver)
-		{
-			hRecv.run();
-		}
-		
-		for (HelloSender hSend: hSender)
-		{
-			hSend.run();
-		}
+        myHSenderManager.startHSenderThreads();
+        myHRecvManager.startHRecvThread();
 	}
 		
 	public void sendHelloPacket(DatagramSocket dSocket, HelloPacket helloPacket)
@@ -120,52 +124,78 @@ public class HelloManager{
 	
 }
 
-class HelloReceiver implements Runnable
+class HelloSender
 {
-	DatagramSocket mySocket = null;
+    byte[] buffer = new byte[65508];
+    private ScheduledExecutorService scheduler = null;
+    ArrayList<Runnable> hSendList = new ArrayList<Runnable>();
+
+    private Runnable hSendRunnable(final InetAddress targetIPAddr, final DatagramSocket localSocket)
+    {
+        Runnable hSend = new Runnable()
+        {
+            public void run()
+            {
+                System.out.println("sending to " + targetIPAddr.getHostAddress() + " on local port " + localSocket.getLocalPort());
+                System.out.println("my ip is " + localSocket.getLocalAddress());
+            };
+        };
+
+        return hSend;
+    };
+
+    public HelloSender(ArrayList<InetAddress> targetIPs) throws SocketException {
+
+        scheduler = Executors.newScheduledThreadPool(targetIPs.size() + 1);
+        for (InetAddress t : targetIPs)
+        {
+            hSendList.add(hSendRunnable(t, new DatagramSocket()));
+        }
+        System.out.print("I have " + targetIPs.size() + " targets");
+    }
+
+    public void startHSenderThreads()
+    {
+        System.out.print("going going gone");
+        for (Runnable hSR : hSendList)
+        {
+            scheduler.scheduleAtFixedRate(hSR, 0, HelloPacket.sendInterval, TimeUnit.SECONDS);
+        }
+
+    }
 	
-	public HelloReceiver(int myListeningPort) throws SocketException {
-		this.mySocket = new DatagramSocket(myListeningPort);
-	}
-	
-	//TODO Complete
-	@Override
-	public void run() {
-		
-		//Receiver code here
-		System.out.println("Hello Receiver started on port " +  mySocket.getLocalPort());
-		
-	}
 }
 
-class HelloSender implements Runnable
+class HelloReceiver 
 {
-	InetAddress targetIPAddr;
-	DatagramSocket targetSocket = null;
-	byte[] buffer = new byte[65508];
-	
-	public HelloSender(InetAddress myIPAddr) throws SocketException {
-		this.targetIPAddr = myIPAddr;
-		this.targetSocket = new DatagramSocket();
-		
-	}
-	
-	//TODO Complete
-	@Override
-	public void run() {
-		
-		TimerTask sendHello = new TimerTask(){
+    byte[] buffer = new byte[65508];
+    Runnable hReceiver = null;
+    
+    private Runnable hRecvRunnable(final DatagramSocket localSocket)
+    {
+        Runnable hSend = new Runnable()
+        {
+            public void run()
+            {
+                while(true)
+                {
+                    System.out.println("listening on " + localSocket.getLocalAddress() + " on local port " + localSocket.getLocalPort());
+                    System.out.println("listening to " + localSocket.getRemoteSocketAddress());
+                }
+            };
+        };
 
-			@Override
-			public void run() {
-				//sendHelloPacket();
-				//targetpacket = new DatagramSocket(buffer, buffer.length, targetIPAddr, HelloManager.helloProtocolPort);
-			}
-			
-		};
-		
-		//Sender code here
-		System.out.println("Hello Sender started on port " +  targetSocket.getLocalPort());
-		
-	}
+        return hSend;
+    };
+
+    public HelloReceiver(DatagramSocket localSocket) throws SocketException {
+        hReceiver = hRecvRunnable(localSocket);
+    }
+
+    public void startHRecvThread()
+    {
+        System.out.print("listening listening listen");
+        hReceiver.run();
+
+    }
 }
