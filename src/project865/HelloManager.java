@@ -79,6 +79,30 @@ public class HelloManager{
 		
 	}
 	
+	public static void sendHelloPacket(int port, String targetIp, HelloPacket helloPacket)
+	{
+                byte[] buffer = new byte[65508];
+		ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
+		ObjectOutput hPacket = null;
+		
+		try {
+			hPacket = new ObjectOutputStream(byteOutputStream);
+			hPacket.writeObject(helloPacket);
+			byte[] hPBytes = byteOutputStream.toByteArray();
+			
+			//DatagramPacket dPacket = new DatagramPacket(hPBytes, hPBytes.length);
+                        DatagramPacket dPacket = new DatagramPacket(hPBytes, hPBytes.length, InetAddress.getByName(targetIp), 10090);
+                        DatagramSocket dSocket = new DatagramSocket();
+                        System.out.println("" + hPBytes.toString() + " "+ hPBytes.length + " " + targetIp + " 10090");
+			dSocket.send(dPacket);
+			byteOutputStream.close();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
 	public HelloPacket receiveHelloPacket(DatagramSocket dSocket, String expectedUniqueID)
 	{
 		byte[] buffer = new byte[2000];
@@ -181,6 +205,7 @@ class HelloReceiver
                 {
                     System.out.println("listening on " + localSocket.getLocalAddress() + " on local port " + localSocket.getLocalPort());
                     System.out.println("listening to " + localSocket.getRemoteSocketAddress());
+                    HelloManager.sendHelloPacket(targetSocket.getLocalPort(), targetIPAddr.getHostAddress(), new HelloPacket(HelloManager.myUniqueID, map, targetIPAddr, targetSocket));
                 }
             };
         };
