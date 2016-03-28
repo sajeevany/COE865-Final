@@ -22,10 +22,11 @@ public class RoutingTableEntry {
 	private String uniqueID;
 	private HashMap<String, ArrayList<String>> neighbourAndResource = new HashMap<String, ArrayList<String>>();
 
-	public RoutingTableEntry(String nextHop, int nextHopSocket, String uniqueID, HashMap<String, String> neighbourResourceMap) {
+	public RoutingTableEntry(String nextHop, int nextHopSocket, String uniqueID, HashMap<String, ArrayList<String>> nRMap) {
 		this.nextHop = nextHop;
 		this.nextHopSocket = nextHopSocket;
 		this.uniqueID = uniqueID;
+                this.neighbourAndResource = nRMap;
 	}
 
 	public String getNextHop() {

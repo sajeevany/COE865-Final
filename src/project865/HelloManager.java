@@ -12,6 +12,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -38,11 +39,8 @@ public class HelloManager{
             this.myIPSocketMap = myIPSocketMap;
 
             //initialize routing table
-            HashMap<String, String> nResMap = new HashMap<String, String>();
-            for (String res : myResources)
-            {
-                nResMap.put(uniqueID, res);
-            }
+            HashMap<String, ArrayList<String>> nResMap = new HashMap<String, ArrayList<String>>();
+            nResMap.put(this.myUniqueID, new ArrayList<String>(Arrays.asList(myResources)));
             //initialize routing table with local values
             for (Map.Entry<InetAddress,DatagramSocket> sockMap : myIPSocketMap.entrySet())
             {
