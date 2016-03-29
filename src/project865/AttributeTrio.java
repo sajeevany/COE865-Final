@@ -7,13 +7,12 @@ package project865;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 public class AttributeTrio implements Serializable{
     
-    private String myUniqueID = null;
-    private Map<String, ArrayList<String>> uniqueIDResourceMap = new HashMap<String,  ArrayList<String>>();
+    private String uniqueID = null;
+    private ArrayList<String> uniqueIDResourceMap = new ArrayList<String>();
     private ArrayList<String> myDirectlyConnectedNeighbourUniqueIDs = null;
 
     /*
@@ -28,22 +27,22 @@ public class AttributeTrio implements Serializable{
                Table to be more easily calculated
     *    
     */
-    public AttributeTrio(String myUniqueID, Map<String, ArrayList<String>> uniqueIDResourceMap, ArrayList<String> myDirectlyConnectedNeighbourUniqueIDs)           
+    public AttributeTrio(String uniqueID, ArrayList<String> resourceList, ArrayList<String> myDirectlyConnectedNeighbourUniqueIDs)           
     {
-        this.myUniqueID = myUniqueID;
-        this.uniqueIDResourceMap = uniqueIDResourceMap;
+        this.uniqueID = uniqueID;
+        this.uniqueIDResourceMap = resourceList;
         this.myDirectlyConnectedNeighbourUniqueIDs = myDirectlyConnectedNeighbourUniqueIDs;
     }
     
-    public String getMyUniqueID() {
-        return myUniqueID;
+    public String getUniqueID() {
+        return uniqueID;
     }
 
-    public Map<String, ArrayList<String>> getUniqueIDResourceMap() {
+    public ArrayList<String> getResourceList() {
         return uniqueIDResourceMap;
     }
 
-    public ArrayList<String> getMyDirectlyConnectedNeighbourUniqueIDs() {
+    public ArrayList<String> getDirectlyConnectedNeighbourUniqueIDs() {
         return myDirectlyConnectedNeighbourUniqueIDs;
     }
     
