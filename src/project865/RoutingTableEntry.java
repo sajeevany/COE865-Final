@@ -65,10 +65,13 @@ public class RoutingTableEntry {
         String uniqueID = "NaN";
 
         for (AttributeTrio trioA : this.getAttributesList())
-        {
-            if (trioA.getResourceList().contains(resource))
+        {          
+            for (Map.Entry<String, ArrayList<String>> s : trioA.getHostResourceMap().entrySet())
             {
-                return trioA.getUniqueID();
+               if (s.getValue().contains(resource))
+               {
+                   return s.getKey();
+               }
             }
         }
 

@@ -1,6 +1,7 @@
 package project865;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Map;
 
 public class HelloPacket implements Serializable {
 
@@ -43,10 +44,17 @@ public class HelloPacket implements Serializable {
 		for(AttributeTrio aTrio: getAttributesList())
 		{
                     sB.append(aTrio.getUniqueID() + " ");
-                    for (String s : aTrio.getResourceList())
+                    for (Map.Entry<String, ArrayList<String>> s : aTrio.getHostResourceMap().entrySet())
                     {
-                        sB.append(s + ",");
+                        sB.append("host: " + s.getKey() );
+                        for (String str : s.getValue())
+                        {
+                            sB.append("s,");
+                        }
+                         sB.deleteCharAt(sB.length() - 1); //delete last
+                         sB.append("\n");
                     }
+                    
                     sB.deleteCharAt(sB.length() - 1); //delete last ,
                     sB.append("\nDirectly Connected Neighbours:\n");
                     for (String s : aTrio.getDirectlyConnectedNeighbourUniqueIDs())

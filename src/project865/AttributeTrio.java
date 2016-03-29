@@ -7,11 +7,14 @@ package project865;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AttributeTrio implements Serializable{
     
     private String uniqueID = null;
-    private ArrayList<String> resourceList = new ArrayList<String>();
+    //private ArrayList<String> resourceList = new ArrayList<String>();
+    private HashMap<String, ArrayList<String>> hostResourceMap = new HashMap<String,  ArrayList<String>>();
     private ArrayList<String> myDirectlyConnectedNeighbourUniqueIDs = null;
 
     /*
@@ -26,10 +29,10 @@ public class AttributeTrio implements Serializable{
                Table to be more easily calculated
     *    
     */
-    public AttributeTrio(String uniqueID, ArrayList<String> resourceList, ArrayList<String> myDirectlyConnectedNeighbourUniqueIDs)           
+    public AttributeTrio(String uniqueID, HashMap<String, ArrayList<String>> hostResourceMap, ArrayList<String> myDirectlyConnectedNeighbourUniqueIDs)           
     {
         this.uniqueID = uniqueID;
-        this.resourceList = resourceList;
+        this.hostResourceMap = hostResourceMap;
         this.myDirectlyConnectedNeighbourUniqueIDs = myDirectlyConnectedNeighbourUniqueIDs;
     }
     
@@ -37,8 +40,8 @@ public class AttributeTrio implements Serializable{
         return uniqueID;
     }
 
-    public ArrayList<String> getResourceList() {
-        return resourceList;
+    public HashMap<String, ArrayList<String>> getHostResourceMap() {
+        return hostResourceMap;
     }
 
     public ArrayList<String> getDirectlyConnectedNeighbourUniqueIDs() {
@@ -51,11 +54,18 @@ public class AttributeTrio implements Serializable{
         
 
         sB.append(this.uniqueID+ " ");
-        for (String s : this.resourceList)
+        sB.append("\nHost - Resources:\n");
+        for (Map.Entry<String, ArrayList<String>> s : this.hostResourceMap.entrySet())
         {
-            sB.append(s + ",");
+            sB.append("host: " + s.getKey() );
+            for (String str : s.getValue())
+            {
+                sB.append("s,");
+            }
+             sB.deleteCharAt(sB.length() - 1); //delete last
+             sB.append("\n");
         }
-        sB.deleteCharAt(sB.length() - 1); //delete last ,
+       
         sB.append("\nDirectly Connected Neighbours:\n");
         for (String s : this.myDirectlyConnectedNeighbourUniqueIDs)
         {

@@ -13,6 +13,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -38,7 +39,10 @@ public class HelloManager{
             this.myIPSocketMap = myIPSocketMap;
 
             //initialize routing table
-            final AttributeTrio myATrio = new AttributeTrio(this.myUniqueID, new ArrayList<String>(Arrays.asList(myResources)), null);
+            HashMap<String, ArrayList<String>> hrMap = new HashMap<String, ArrayList<String>>();
+            hrMap.put(this.myUniqueID, new ArrayList<String>(Arrays.asList(myResources)));
+            
+            final AttributeTrio myATrio = new AttributeTrio(this.myUniqueID, hrMap, null);
            
             //initialize routing table with local values
             for (Map.Entry<InetAddress,DatagramSocket> sockMap : myIPSocketMap.entrySet())
