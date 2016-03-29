@@ -28,7 +28,10 @@ public class RoutingTable {
     {
         if (!routingEntries.contains(rTEntry))
         {
-            this.routingEntries.add(rTEntry);
+            //drop old one
+            
+            //add new one
+            this.routingEntries.add(rTEntry);           
         }
         else
         {

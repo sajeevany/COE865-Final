@@ -13,7 +13,6 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -39,12 +38,12 @@ public class HelloManager{
             this.myIPSocketMap = myIPSocketMap;
 
             //initialize routing table
-            HashMap<String, ArrayList<String>> nResMap = new HashMap<String, ArrayList<String>>();
-            nResMap.put(this.myUniqueID, new ArrayList<String>(Arrays.asList(myResources)));
+            final AttributeTrio myATrio = new AttributeTrio(this.myUniqueID, new ArrayList<String>(Arrays.asList(myResources)), null);
+           
             //initialize routing table with local values
             for (Map.Entry<InetAddress,DatagramSocket> sockMap : myIPSocketMap.entrySet())
             {
-                RoutingTable.getRoutingTableInstance().addRoute(new RoutingTableEntry(sockMap.getKey().getHostAddress(), sockMap.getValue().getLocalPort(), uniqueID, nResMap));
+                RoutingTable.getRoutingTableInstance().addRoute(new RoutingTableEntry(sockMap.getKey().getHostAddress(), sockMap.getValue().getLocalPort(), uniqueID, new ArrayList<AttributeTrio>(){{add(myATrio);}} ));
             }
             
 
@@ -174,11 +173,11 @@ class HelloSender
                 //HashMap<String, String> neighbourAndResource = new HashMap<String, String>();
                 //neighbourAndResource.put("R5", "my exam");
                 ArrayList<RoutingTableEntry> routeList = RoutingTable.getRoutingTableInstance().getRoutes();
-                HashMap<String,ArrayList<String>> netResourceList = new HashMap<String,ArrayList<String>>();
+                ArrayList<AttributeTrio> netResourceList = new ArrayList<AttributeTrio>();
                 
                 for (RoutingTableEntry route: routeList)
                 {
-                    netResourceList.putAll(route.getNeighbourAndResource());
+                    netResourceList.addAll(route.getAttributesList());
                 }
                 
                 HelloManager.sendHelloPacket(targetSocket.getLocalPort(), targetIPAddr.getHostAddress(), new HelloPacket(myUniqueID, netResourceList, queryIP, myQueryPort));
@@ -235,46 +234,28 @@ class HelloSender
 	
 }
 
-class HelloReceiver {
-
+class HelloReceiver 
+{
     byte[] buffer = new byte[65508];
-    DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
     Runnable hReceiver = null;
-
-    private Runnable hRecvRunnable(final DatagramSocket localSocket) {
-        Runnable hSend = new Runnable() {
-            @Override
-            public void run() {
-                System.out.println("listening on " + localSocket.getLocalAddress() + " on local port " + localSocket.getLocalPort());
-                System.out.println("listening to " + localSocket.getRemoteSocketAddress());
-                while (true) {
-                    packet.setLength(65508);
-                    try {
-                        localSocket.receive(packet);
-                        ByteArrayInputStream baos = new ByteArrayInputStream(buffer);
-                        ObjectInputStream oos = new ObjectInputStream(baos);
-                        HelloPacket helloReceived;
-                        try {
-                            helloReceived = (HelloPacket) oos.readObject();
-                            System.out.println(helloReceived.toString());
-                            RoutingTableEntry receivedTableEntry = new RoutingTableEntry(helloReceived.getMyAddress(), helloReceived.getMySocket(), helloReceived.getMyUniqueID(), helloReceived.getUniqueIDResourceMap());
-                            
-                        } catch (ClassNotFoundException ex) {
-                             ex.printStackTrace();
-                            // Logger.getLogger(HelloReceiver.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                      //  Logger.getLogger(HelloReceiver.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-
+    
+    private Runnable hRecvRunnable(final DatagramSocket localSocket)
+    {
+        Runnable hSend = new Runnable()
+        {
+            public void run()
+            {
+                while(true)
+                {
+                    System.out.println("listening on " + localSocket.getLocalAddress() + " on local port " + localSocket.getLocalPort());
+                    System.out.println("listening to " + localSocket.getRemoteSocketAddress());
+               
                 }
-            }
-        ;
+            };
         };
 
         return hSend;
-    }
+    };
 
     public HelloReceiver(DatagramSocket localSocket) throws SocketException {
         hReceiver = hRecvRunnable(localSocket);

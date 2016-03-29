@@ -7,12 +7,11 @@ package project865;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Map;
 
 public class AttributeTrio implements Serializable{
     
     private String uniqueID = null;
-    private ArrayList<String> uniqueIDResourceMap = new ArrayList<String>();
+    private ArrayList<String> resourceList = new ArrayList<String>();
     private ArrayList<String> myDirectlyConnectedNeighbourUniqueIDs = null;
 
     /*
@@ -30,7 +29,7 @@ public class AttributeTrio implements Serializable{
     public AttributeTrio(String uniqueID, ArrayList<String> resourceList, ArrayList<String> myDirectlyConnectedNeighbourUniqueIDs)           
     {
         this.uniqueID = uniqueID;
-        this.uniqueIDResourceMap = resourceList;
+        this.resourceList = resourceList;
         this.myDirectlyConnectedNeighbourUniqueIDs = myDirectlyConnectedNeighbourUniqueIDs;
     }
     
@@ -39,11 +38,31 @@ public class AttributeTrio implements Serializable{
     }
 
     public ArrayList<String> getResourceList() {
-        return uniqueIDResourceMap;
+        return resourceList;
     }
 
     public ArrayList<String> getDirectlyConnectedNeighbourUniqueIDs() {
         return myDirectlyConnectedNeighbourUniqueIDs;
+    }
+    
+    public String toString()
+    {
+        StringBuilder sB = new StringBuilder();
+        
+
+        sB.append(this.uniqueID+ " ");
+        for (String s : this.resourceList)
+        {
+            sB.append(s + ",");
+        }
+        sB.deleteCharAt(sB.length() - 1); //delete last ,
+        sB.append("\nDirectly Connected Neighbours:\n");
+        for (String s : this.myDirectlyConnectedNeighbourUniqueIDs)
+        {
+            sB.append(s + ",");
+        }
+		
+        return sB.toString();       
     }
     
     
