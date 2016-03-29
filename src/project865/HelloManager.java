@@ -234,28 +234,46 @@ class HelloSender
 	
 }
 
-class HelloReceiver 
-{
+class HelloReceiver {
+
     byte[] buffer = new byte[65508];
+    DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
     Runnable hReceiver = null;
-    
-    private Runnable hRecvRunnable(final DatagramSocket localSocket)
-    {
-        Runnable hSend = new Runnable()
-        {
-            public void run()
-            {
-                while(true)
-                {
-                    System.out.println("listening on " + localSocket.getLocalAddress() + " on local port " + localSocket.getLocalPort());
-                    System.out.println("listening to " + localSocket.getRemoteSocketAddress());
-               
+
+    private Runnable hRecvRunnable(final DatagramSocket localSocket) {
+        Runnable hSend = new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("listening on " + localSocket.getLocalAddress() + " on local port " + localSocket.getLocalPort());
+                System.out.println("listening to " + localSocket.getRemoteSocketAddress());
+                while (true) {
+                    packet.setLength(65508);
+                    try {
+                        localSocket.receive(packet);
+                        ByteArrayInputStream baos = new ByteArrayInputStream(buffer);
+                        ObjectInputStream oos = new ObjectInputStream(baos);
+                        HelloPacket helloReceived;
+                        try {
+                            helloReceived = (HelloPacket) oos.readObject();
+                            System.out.println(helloReceived.toString());
+                            RoutingTableEntry receivedTableEntry = new RoutingTableEntry(helloReceived.getMyAddress(), helloReceived.getMyFTSocket() , helloReceived.getMyUniqueID(), helloReceived.getAttributesList());
+                            RoutingTable.getRoutingTableInstance().addRoute(receivedTableEntry);
+                        } catch (ClassNotFoundException ex) {
+                             ex.printStackTrace();
+                            // Logger.getLogger(HelloReceiver.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                      //  Logger.getLogger(HelloReceiver.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+
                 }
-            };
+            }
+        ;
         };
 
         return hSend;
-    };
+    }
 
     public HelloReceiver(DatagramSocket localSocket) throws SocketException {
         hReceiver = hRecvRunnable(localSocket);
