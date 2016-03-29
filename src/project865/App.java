@@ -5,7 +5,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -74,10 +73,6 @@ public class App {
                     br.close();
 		}	
 		
-                //needs resource list unique + reousrce
-                //needs port
-                
-                
 		this.hManager = new HelloManager(this.myUniqueID, targetMachineIPs, this.myIPSocketMap, myResourceList);
 		this.hManager.runManager();
 	}
@@ -92,8 +87,6 @@ public class App {
 		StringTokenizer sTok = new StringTokenizer(IP,".");
 		StringBuilder sBuild = new StringBuilder(); 
 		
-                System.out.println(IP + " getNetwork");
-                
 		for (int j = 0; j < sTok.countTokens(); j++ )
 		{
 			sBuild.append(sTok.nextToken() + ".");
