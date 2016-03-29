@@ -8,7 +8,7 @@ public class HelloPacket implements Serializable {
 
 	private String myUniqueID = null;
 	// uniqueID, resource
-	private Map<String, ArrayList<String>> uniqueIDResourceMap = new HashMap<String,  ArrayList<String>>();
+	private HashMap<String, ArrayList<String>> uniqueIDResourceMap = new HashMap<String,  ArrayList<String>>();
 	private String myAddress;
 	private int mySocket;
 
@@ -25,14 +25,14 @@ public class HelloPacket implements Serializable {
 	
 	public String toString()
 	{
-		StringBuilder sB = new StringBuilder("myUniqueID: " + myUniqueID + "\n");
+		StringBuilder sB = new StringBuilder("myUniqueID: " + getMyUniqueID() + "\n");
 		
-		sB.append("InetAddr" + ": "  + myAddress + "\n");
-		sB.append("DatagramSockets" + ": "  + mySocket + "\n");
+		sB.append("InetAddr" + ": "  + getMyAddress() + "\n");
+		sB.append("DatagramSockets" + ": "  + getMySocket() + "\n");
 				
 		sB.append("\nResource List\n");
 		
-		for(Map.Entry<String, ArrayList<String>> entrySet : uniqueIDResourceMap.entrySet())
+		for(Map.Entry<String, ArrayList<String>> entrySet : getUniqueIDResourceMap().entrySet())
 		{
                     for(String resource : entrySet.getValue())
                     {
@@ -42,5 +42,40 @@ public class HelloPacket implements Serializable {
 		
 		return sB.toString();
 	}
+
+    /**
+     * @return the myUniqueID
+     */
+    public String getMyUniqueID() {
+        return myUniqueID;
+    }
+
+    /**
+     * @param myUniqueID the myUniqueID to set
+     */
+    public void setMyUniqueID(String myUniqueID) {
+        this.myUniqueID = myUniqueID;
+    }
+
+    /**
+     * @return the uniqueIDResourceMap
+     */
+    public HashMap<String, ArrayList<String>> getUniqueIDResourceMap() {
+        return uniqueIDResourceMap;
+    }
+
+    /**
+     * @return the myAddress
+     */
+    public String getMyAddress() {
+        return myAddress;
+    }
+
+    /**
+     * @return the mySocket
+     */
+    public int getMySocket() {
+        return mySocket;
+    }
 }
 
