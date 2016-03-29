@@ -27,7 +27,7 @@ public class RoutingTableEntry {
             this.nextHopSocket = nextHopSocket;
             this.uniqueID = uniqueID;
             this.attributesList = nRMap;
-             System.out.println("Created Routing Table entry nextHop: " + this.nextHop + " nH socket: " + this.nextHopSocket + " UID :"+this.uniqueID +" Resource List: "+this.attributesList);
+             System.out.println("Created Routing Table entry nextHop: " + this.nextHop + " nH socket: " + this.nextHopSocket + " UID :"+this.uniqueID );
     }
 
     public String getNextHop() {
