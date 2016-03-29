@@ -33,14 +33,14 @@ public class HelloPacket implements Serializable {
         @Override
 	public String toString()
 	{
-		StringBuilder sB = new StringBuilder("myUniqueID: " + myUniqueID + "\n");
+		StringBuilder sB = new StringBuilder("myUniqueID: " + getMyUniqueID() + "\n");
 		
-		sB.append("InetAddr" + ": "  + myAddress + "\n");
-		sB.append("DatagramSockets" + ": "  + myFTSocket + "\n");
+		sB.append("InetAddr" + ": "  + getMyAddress() + "\n");
+		sB.append("DatagramSockets" + ": "  + getMyFTSocket() + "\n");
 				
 		sB.append("\nResource List:\n");
 		
-		for(AttributeTrio aTrio: attributesList)
+		for(AttributeTrio aTrio: getAttributesList())
 		{
                     sB.append(aTrio.getUniqueID() + " ");
                     for (String s : aTrio.getResourceList())
@@ -57,5 +57,40 @@ public class HelloPacket implements Serializable {
 		
 		return sB.toString();
 	}
+
+    /**
+     * @return the myUniqueID
+     */
+    public String getMyUniqueID() {
+        return myUniqueID;
+    }
+
+    /**
+     * @param myUniqueID the myUniqueID to set
+     */
+    public void setMyUniqueID(String myUniqueID) {
+        this.myUniqueID = myUniqueID;
+    }
+
+    /**
+     * @return the myAddress
+     */
+    public String getMyAddress() {
+        return myAddress;
+    }
+
+    /**
+     * @return the myFTSocket
+     */
+    public int getMyFTSocket() {
+        return myFTSocket;
+    }
+
+    /**
+     * @return the attributesList
+     */
+    public ArrayList<AttributeTrio> getAttributesList() {
+        return attributesList;
+    }
 }
 
