@@ -33,7 +33,7 @@ public class RoutingTableEntry {
     }
 
     //@author Riccardo Cossu
-    public ArrayList<AttributeTrio> removeDuplicates(ArrayList<AttributeTrio> tr) {
+    public static ArrayList<AttributeTrio> removeDuplicates(ArrayList<AttributeTrio> tr) {
         // ... the list is already populated
         Set<AttributeTrio> s = new TreeSet<AttributeTrio>(new Comparator<AttributeTrio>() {
 

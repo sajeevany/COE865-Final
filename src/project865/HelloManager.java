@@ -188,7 +188,7 @@ class HelloSender
                 {
                     netResourceList.addAll(route.getAttributesList());
                 }
-                
+                netResourceList = RoutingTableEntry.removeDuplicates(netResourceList);
                 HelloManager.sendHelloPacket(targetSocket.getLocalPort(), targetIPAddr.getHostAddress(), new HelloPacket(myUniqueID, netResourceList, queryIP, myQueryPort));
                 System.out.println("sent");
             };
@@ -196,10 +196,6 @@ class HelloSender
 
         return hSend;
     };
-
-    
-    //public HelloSender(ArrayList<InetAddress> targetIPs, String myUniqueID, Map<InetAddress, DatagramSocket> myIPSocketMap) throws SocketException {
-    //public HelloSender(HashMap<String,String> srcTargetIPMap, String myUniqueID, Map<InetAddress, DatagramSocket> myIPSocketMap) throws SocketException {
     
     public HelloSender(ArrayList<SourceTargetIPPair> stIPPairList, String myUniqueID, Map<InetAddress, DatagramSocket> myIPSocketMap) throws SocketException {
     
