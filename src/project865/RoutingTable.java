@@ -28,6 +28,7 @@ public class RoutingTable {
     {
         if (!routingEntries.contains(rTEntry))
         {
+        	System.out.println(rTEntry.toString());
             //drop old one
             
             //add new one

@@ -33,28 +33,31 @@ public class HelloManager{
 	
 	public HelloManager(String uniqueID, ArrayList<InetAddress> targetIPs, Map<InetAddress, DatagramSocket> myIPSocketMap, String[] myResources) throws SocketException
 	{
-            //initialize default values that should not change
-            this.myUniqueID = uniqueID;
-            this.targetIPs = targetIPs;
-            this.myIPSocketMap = myIPSocketMap;
+        //initialize default values that should not change
+        this.myUniqueID = uniqueID;
+        this.targetIPs = targetIPs;
+        this.myIPSocketMap = myIPSocketMap;
 
-            //initialize routing table
-            HashMap<String, ArrayList<String>> hrMap = new HashMap<String, ArrayList<String>>();
-            hrMap.put(this.myUniqueID, new ArrayList<String>(Arrays.asList(myResources)));
-            
-            final AttributeTrio myATrio = new AttributeTrio(this.myUniqueID, hrMap, null);
-           
-            //initialize routing table with local values
-            for (Map.Entry<InetAddress,DatagramSocket> sockMap : myIPSocketMap.entrySet())
-            {
-                RoutingTable.getRoutingTableInstance().addRoute(new RoutingTableEntry(sockMap.getKey().getHostAddress(), sockMap.getValue().getLocalPort(), uniqueID, new ArrayList<AttributeTrio>(){{add(myATrio);}} ));
-            }
-            
-
-            //Attach a receiver to listen to the default hello port
-            myHSenderManager = new HelloSender(targetIPs, this.myUniqueID, this.myIPSocketMap);
-		//require single hello receiver for listening
-            myHRecvManager = new HelloReceiver(new DatagramSocket(this.helloProtocolPort));
+        //initialize routing table
+        HashMap<String, ArrayList<String>> hrMap = new HashMap<String, ArrayList<String>>();
+        hrMap.put(this.myUniqueID, new ArrayList<String>(Arrays.asList(myResources)));
+        
+        //Add local information into routing table
+        ArrayList<String> myDCNeighbours = new ArrayList<String>();
+        for (InetAddress iP: targetIPs)
+        {
+        	myDCNeighbours.add(iP.getHostAddress());
+        }
+        final AttributeTrio myATrio = new AttributeTrio(this.myUniqueID, hrMap, myDCNeighbours);
+        for (Map.Entry<InetAddress,DatagramSocket> sockMap : myIPSocketMap.entrySet())
+        {
+            RoutingTable.getRoutingTableInstance().addRoute(new RoutingTableEntry(sockMap.getKey().getHostAddress(), sockMap.getValue().getLocalPort(), uniqueID, new ArrayList<AttributeTrio>(){{add(myATrio);}} ));
+        }
+        
+        //Attach a receiver to listen to the default hello port
+        myHSenderManager = new HelloSender(targetIPs, this.myUniqueID, this.myIPSocketMap);
+        //require single hello receiver for listening
+        myHRecvManager = new HelloReceiver(new DatagramSocket(this.helloProtocolPort));
 
 		/*hReceiver.add(new HelloReceiver(helloProtocolPort));*/     
 	}
@@ -64,7 +67,7 @@ public class HelloManager{
 	public void runManager()
 	{
         myHSenderManager.startHSenderThreads();
-       // myHRecvManager.startHRecvThread();
+        myHRecvManager.startHRecvThread();
 	}
 		
 	public void sendHelloPacket(DatagramSocket dSocket, HelloPacket helloPacket)
@@ -89,7 +92,7 @@ public class HelloManager{
 	
 	public static void sendHelloPacket(int port, String targetIp, HelloPacket helloPacket)
 	{
-                byte[] buffer = new byte[65508];
+        byte[] buffer = new byte[65508];
 		ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
 		ObjectOutput hPacket = null;
 		
@@ -98,10 +101,9 @@ public class HelloManager{
 			hPacket.writeObject(helloPacket);
 			byte[] hPBytes = byteOutputStream.toByteArray();
 			
-			//DatagramPacket dPacket = new DatagramPacket(hPBytes, hPBytes.length);
-                        DatagramPacket dPacket = new DatagramPacket(hPBytes, hPBytes.length, InetAddress.getByName(targetIp), 10090);
-                        DatagramSocket dSocket = new DatagramSocket();
-                        System.out.println("" + hPBytes.toString() + " "+ hPBytes.length + " " + targetIp + " 10090");
+            DatagramPacket dPacket = new DatagramPacket(hPBytes, hPBytes.length, InetAddress.getByName(targetIp), 10090);
+            DatagramSocket dSocket = new DatagramSocket();
+     
 			dSocket.send(dPacket);
 			byteOutputStream.close();
 			
@@ -169,10 +171,9 @@ class HelloSender
         {
             public void run()
             {
-                System.out.println("sending to " + targetIPAddr.getHostAddress() + " on local port " + targetSocket.getLocalPort());
-                System.out.println("my ip is " + targetSocket.getLocalAddress());
-                
-                //in  actuallity we are going to send our entire routing table's resource map
+                System.out.println("sending to " + targetIPAddr.getHostAddress() + " on local port " + targetSocket.getLocalPort() + " my ip is " + targetIPAddr.getHostAddress());
+                              
+                //in  actuality we are going to send our entire routing table's resource map
                 //for testing 
                 //HashMap<String, String> neighbourAndResource = new HashMap<String, String>();
                 //neighbourAndResource.put("R5", "my exam");
@@ -223,12 +224,13 @@ class HelloSender
             
             
         }
-        System.out.print("I have " + targetIPs.size() + " targets");
+        //TODO remove debug message at later date
+        System.out.println("I have " + targetIPs.size() + " targets");
     }
 
     public void startHSenderThreads()
     {
-        System.out.print("going going gone");
+        System.out.println("Starting sender threads. I'm spinning up " + hSendList.size() + " threads");
         for (Runnable hSR : hSendList)
         {
             scheduler.scheduleAtFixedRate(hSR, 0, HelloPacket.sendInterval, TimeUnit.SECONDS);
@@ -285,7 +287,7 @@ class HelloReceiver {
 
     public void startHRecvThread()
     {
-        System.out.print("listening listening listen");
+        System.out.println("Starting listener/receiver threads. I'm spinning up " + 1 + " thread");
         hReceiver.run();
 
     }

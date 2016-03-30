@@ -15,7 +15,7 @@ public class AttributeTrio implements Serializable{
     private String uniqueID = null;
     //private ArrayList<String> resourceList = new ArrayList<String>();
     private HashMap<String, ArrayList<String>> hostResourceMap = new HashMap<String,  ArrayList<String>>();
-    private ArrayList<String> myDirectlyConnectedNeighbourUniqueIDs = null;
+    private ArrayList<String> myDirectlyConnectedNeighbourUniqueIDs = new ArrayList<String>();
 
     /*
     * For use by the Hello Packet and Routing Table entry
@@ -53,24 +53,34 @@ public class AttributeTrio implements Serializable{
         StringBuilder sB = new StringBuilder();
         
 
-        sB.append(this.uniqueID+ " ");
-        sB.append("\nHost - Resources:\n");
+        sB.append("\nUniqueID: ");
+        sB.append(this.uniqueID);
         for (Map.Entry<String, ArrayList<String>> s : this.hostResourceMap.entrySet())
         {
-            sB.append("host: " + s.getKey() );
+            sB.append("\nhost: " + s.getKey() + " resource: ");
             for (String str : s.getValue())
             {
-                sB.append("s,");
+                sB.append(str + ",");
             }
-             sB.deleteCharAt(sB.length() - 1); //delete last
-             sB.append("\n");
+             sB.deleteCharAt(sB.length() - 1); //delete last ','
         }
        
-        sB.append("\nDirectly Connected Neighbours:\n");
-        for (String s : this.myDirectlyConnectedNeighbourUniqueIDs)
+        sB.append("\nDirectly Connected Neighbours: ");
+        
+        if (this.myDirectlyConnectedNeighbourUniqueIDs.isEmpty())
         {
-            sB.append(s + ",");
+        	sB.append("UniqueIDs of DC neighbours are unknown");
         }
+        else
+        {
+        	for (String s : this.myDirectlyConnectedNeighbourUniqueIDs)
+            {
+                sB.append(s + ",");
+            }
+        	sB.deleteCharAt(sB.length() - 1); //delete last ','
+            sB.append("\n");
+        }
+        
 		
         return sB.toString();       
     }
