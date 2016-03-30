@@ -93,11 +93,14 @@ public class App {
 		//this.hManager = new HelloManager(this.myUniqueID, sourceTargetIPMap, this.myIPSocketMap, myResourceList);
 		this.hManager = new HelloManager(this.myUniqueID, stIPPairList, this.myIPSocketMap, myResourceList);
 		this.hManager.runManager();
+		
+
 	}
 		
 	public static void main(String[] args) throws IOException {
 		
-		App client1 = new App(new String[]{"25.24.30.123", "25.24.30.123"}, new int[] {23245, 11111}, new String[] {"sajPC.txt", "candy.png"}, "R2", "config");
+		App client1 = new App(new String[]{"25.113.28.132"}, new int[] {8005}, new String[] {"Arjun.txt"}, "R5", "config");
+		
 	}
 
 	public static String getNetwork(String IP)
