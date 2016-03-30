@@ -188,13 +188,13 @@ class HelloSender
                 {
                     netResourceList.addAll(route.getAttributesList());
                 }
-                HelloPacket t  = new HelloPacket(myUniqueID, netResourceList, queryIP, myQueryPort);
-                
                 netResourceList = RoutingTableEntry.removeDuplicates(netResourceList);
-                HelloManager.sendHelloPacket(targetSocket.getLocalPort(), targetIPAddr.getHostAddress(), new HelloPacket(myUniqueID, netResourceList, queryIP, myQueryPort));
+                HelloPacket helloP  = new HelloPacket(myUniqueID, netResourceList, queryIP, myQueryPort);
+                
+                HelloManager.sendHelloPacket(targetSocket.getLocalPort(), targetIPAddr.getHostAddress(), helloP);
                 System.out.println("-------------------Sending Hello -------------------");
                 System.out.println("sending to " + targetIPAddr.getHostAddress() + " on local port " + targetSocket.getLocalPort() + " my ip is " + targetSocket.getLocalAddress().getHostAddress());
-                System.out.println("Hello: " + t.toString());
+                System.out.println("Hello: " + helloP.toString());
                 System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
             };
         };
