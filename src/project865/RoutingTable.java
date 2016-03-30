@@ -2,11 +2,6 @@ package project865;
 
 import java.util.ArrayList;
 
-/**
- *
- * @author s4yogesw
- */
-
 public class RoutingTable {
 
     private static RoutingTable routingTableInstance = null;
@@ -26,25 +21,11 @@ public class RoutingTable {
     
     public void addRoute(RoutingTableEntry rTEntry)
     {
-        if (!routingEntries.contains(rTEntry))
-        {
-        	System.out.println(rTEntry.toString());
-            //drop old one
-            
-            //add new one
-            this.routingEntries.add(rTEntry);           
-        }
-        else
-        {
-            //TODO remove this block when completed
-            //Debug message
-            System.err.println("repeated entry");
-        }
-    }
-    
-    public boolean doesEntryExist(RoutingTableEntry rTEntry)
-    {
-        return routingEntries.contains(rTEntry);
+    	//remove old routes from rTEntry source if exists
+    	removeAssociatedRoutes(rTEntry.getUniqueID());
+    	
+        //add new one
+        this.routingEntries.add(rTEntry); 
     }
     
     public ArrayList<RoutingTableEntry> getRoutes()
@@ -54,14 +35,21 @@ public class RoutingTable {
     
     public void removeAssociatedRoutes(String uniqueID)
     {
+    	ArrayList<RoutingTableEntry> entriesToRemove = new ArrayList<RoutingTableEntry>();
+    	
         for (RoutingTableEntry rte : routingEntries)
         {
             if (rte.getUniqueID().equals(uniqueID))
             {
-                routingEntries.remove(rte);
+            	entriesToRemove.add(rte);
             }
                     
         }
+        
+        if (!entriesToRemove.isEmpty())
+    	{
+    		routingEntries.removeAll(entriesToRemove);
+    	}
     }
     
     public RoutingTableEntry getRoute(String uniqueID)
