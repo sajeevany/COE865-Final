@@ -23,11 +23,11 @@ public class App {
 	private ArrayList<InetAddress> targetMachineIPs = new ArrayList<InetAddress>();
 
 	public App(String[] myIPs, int[] myQuerySockets, String[] myResourceList, String uniqueID, String configFileName) throws IOException {
-            try {
+		try {
 
-                for (int i = 0; i < myQuerySockets.length; i++) {
-                        myIPSocketMap.put(InetAddress.getByName(myIPs[i]), new DatagramSocket(myQuerySockets[i]));
-                }
+	        for (int i = 0; i < myQuerySockets.length; i++) {
+	                myIPSocketMap.put(InetAddress.getByName(myIPs[i]), new DatagramSocket(myQuerySockets[i]));
+	        }
 
 		} catch (SocketException e) {
 
@@ -50,6 +50,7 @@ public class App {
 		}
 		
 		//Read file and find target machines/hosts within my networks
+		HashMap<String,String> sourceTargetIPMap = new HashMap<String, String>();
 		BufferedReader br = null;
 		try {
 			br = new BufferedReader(new FileReader(configFileName));
@@ -57,11 +58,18 @@ public class App {
 			String ipAddr = br.readLine();
 			while(ipAddr != null)
 			{
-				String network = getNetwork(ipAddr);
+				/*String network = getNetwork(ipAddr);
 				//If the IP is within my network and the IP is not my own
 				if (myNetwork.contains(network) && !myIPList.contains(ipAddr))
 				{
 					targetMachineIPs.add(InetAddress.getByName(ipAddr));
+				}*/
+				
+				StringTokenizer sTo = new StringTokenizer(ipAddr, ",");
+				if (sTo.nextElement().equals(myIPs[0]))
+				{
+					//targetMachineIPs.add(InetAddress.getByName((String) sTo.nextElement()));
+					sourceTargetIPMap.put(myIPs[0], (String) sTo.nextElement());
 				}
 				ipAddr = br.readLine();
 			}
@@ -73,13 +81,13 @@ public class App {
                     br.close();
 		}	
 		
-		this.hManager = new HelloManager(this.myUniqueID, targetMachineIPs, this.myIPSocketMap, myResourceList);
+		this.hManager = new HelloManager(this.myUniqueID, sourceTargetIPMap, this.myIPSocketMap, myResourceList);
 		this.hManager.runManager();
 	}
 		
 	public static void main(String[] args) throws IOException {
 		
-		App client1 = new App(new String[]{"172.16.57.8", "10.1.1.3"}, new int[] {10901, 12345}, new String[] {"groupNames.txt", "myFile.txt"}, "R1", "config");
+		App client1 = new App(new String[]{"25.24.30.123","192.168.56.1"}, new int[] {10901, 12345}, new String[] {"groupNames.txt", "myFile.txt"}, "R1", "config");
 	}
 
 	public static String getNetwork(String IP)
