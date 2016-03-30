@@ -5,7 +5,9 @@
 package project865;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class RoutingTableEntry {
 
@@ -18,8 +20,11 @@ public class RoutingTableEntry {
             this.nextHopIP = nextHop;
             this.nextHopSocket = nextHopSocket;
             this.uniqueID = uniqueID;
-            this.attributesList = nRMap;
-             System.out.println("Created Routing Table entry nextHop: " + this.nextHopIP + " nH socket: " + this.nextHopSocket + " UID :"+this.uniqueID );
+            
+            // Remove any duplicates            
+            Set<AttributeTrio> attributeSet = new LinkedHashSet<AttributeTrio>(nRMap);
+            this.attributesList.addAll(attributeSet);
+            System.out.println("Created Routing Table entry nextHop: " + this.nextHopIP + " nH socket: " + this.nextHopSocket + " UID :"+this.uniqueID );
     }
 
     public String getNextHop() {
