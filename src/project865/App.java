@@ -10,8 +10,10 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 public class App {
@@ -50,27 +52,33 @@ public class App {
 		}
 		
 		//Read file and find target machines/hosts within my networks
-		HashMap<String,String> sourceTargetIPMap = new HashMap<String, String>();
+		//HashMap<String,String> sourceTargetIPList = new HashMap<String, String>();
+		ArrayList<SourceTargetIPPair> stIPPairList = new ArrayList<SourceTargetIPPair>();
 		BufferedReader br = null;
 		try {
 			br = new BufferedReader(new FileReader(configFileName));
 			
 			String ipAddr = br.readLine();
+			int i = 0;
 			while(ipAddr != null)
-			{
-				/*String network = getNetwork(ipAddr);
-				//If the IP is within my network and the IP is not my own
-				if (myNetwork.contains(network) && !myIPList.contains(ipAddr))
-				{
-					targetMachineIPs.add(InetAddress.getByName(ipAddr));
-				}*/
-				
+			{		
 				StringTokenizer sTo = new StringTokenizer(ipAddr, ",");
-				if (sTo.nextElement().equals(myIPs[0]))
+				if (sTo.countTokens() > 2)
 				{
-					//targetMachineIPs.add(InetAddress.getByName((String) sTo.nextElement()));
-					sourceTargetIPMap.put(myIPs[0], (String) sTo.nextElement());
+					throw new IllegalArgumentException("Too many parameters in config file");
 				}
+				String sourceIP = sTo.nextToken();
+				String targetIP = sTo.nextToken();
+				
+				for (String myIP : myIPs)
+				{
+					if (sourceIP.equals(myIP))
+					{
+						stIPPairList.add(new SourceTargetIPPair(sourceIP, targetIP));
+						break;
+					}	
+				}
+				
 				ipAddr = br.readLine();
 			}
 			
@@ -81,13 +89,15 @@ public class App {
                     br.close();
 		}	
 		
-		this.hManager = new HelloManager(this.myUniqueID, sourceTargetIPMap, this.myIPSocketMap, myResourceList);
+		//Set<SourceTargetIPPair> stSet = new LinkedHashSet<SourceTargetIPPair>();
+		//this.hManager = new HelloManager(this.myUniqueID, sourceTargetIPMap, this.myIPSocketMap, myResourceList);
+		this.hManager = new HelloManager(this.myUniqueID, stIPPairList, this.myIPSocketMap, myResourceList);
 		this.hManager.runManager();
 	}
 		
 	public static void main(String[] args) throws IOException {
 		
-		App client1 = new App(new String[]{"25.24.30.123","192.168.56.1"}, new int[] {10901, 12345}, new String[] {"groupNames.txt", "myFile.txt"}, "R1", "config");
+		App client1 = new App(new String[]{"25.24.30.123", "25.24.30.123"}, new int[] {23245, 11111}, new String[] {"sajPC.txt", "candy.png"}, "R2", "config");
 	}
 
 	public static String getNetwork(String IP)

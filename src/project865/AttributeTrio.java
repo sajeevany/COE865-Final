@@ -85,7 +85,4 @@ public class AttributeTrio implements Serializable{
         return sB.toString();       
     }
     
-    
-
-    
 }
