@@ -65,11 +65,11 @@ public class AttributeTrio implements Serializable{
              sB.deleteCharAt(sB.length() - 1); //delete last ','
         }
        
-        sB.append("\nDirectly Connected Neighbours: ");
+        sB.append("\nDirectly Connected Neighbours: \n");
         
         if (this.myDirectlyConnectedNeighbourUniqueIDs.isEmpty())
         {
-        	sB.append("UniqueIDs of DC neighbours are unknown");
+        	sB.append("UniqueIDs of DC neighbours are unknown\n");
         }
         else
         {
