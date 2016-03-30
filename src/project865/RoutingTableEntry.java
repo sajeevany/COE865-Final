@@ -41,9 +41,9 @@ public class RoutingTableEntry {
             public int compare(AttributeTrio o1, AttributeTrio o2) {
                 
             	if (o1.getUniqueID().equals(o2.getUniqueID()))
-            		return 1;
-            	else
             		return 0;
+            	else
+            		return 1;
             }
         });
         s.addAll(tr);
