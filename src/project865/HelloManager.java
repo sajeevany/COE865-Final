@@ -175,7 +175,7 @@ class HelloSender
         {
             public void run()
             {
-                System.out.println("sending to " + targetIPAddr.getHostAddress() + " on local port " + targetSocket.getLocalPort() + " my ip is " + targetSocket.getLocalAddress().getHostAddress());
+                
                               
                 //in  actuality we are going to send our entire routing table's resource map
                 //for testing 
@@ -188,9 +188,14 @@ class HelloSender
                 {
                     netResourceList.addAll(route.getAttributesList());
                 }
+                HelloPacket t  = new HelloPacket(myUniqueID, netResourceList, queryIP, myQueryPort);
+                
                 netResourceList = RoutingTableEntry.removeDuplicates(netResourceList);
                 HelloManager.sendHelloPacket(targetSocket.getLocalPort(), targetIPAddr.getHostAddress(), new HelloPacket(myUniqueID, netResourceList, queryIP, myQueryPort));
-                System.out.println("sent");
+                System.out.println("-------------------Sending Hello -------------------");
+                System.out.println("sending to " + targetIPAddr.getHostAddress() + " on local port " + targetSocket.getLocalPort() + " my ip is " + targetSocket.getLocalAddress().getHostAddress());
+                System.out.println("Hello: " + t.toString());
+                System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
             };
         };
 
@@ -272,6 +277,11 @@ class HelloReceiver {
                         try {
                             helloReceived = (HelloPacket) oos.readObject();
                             System.out.println(helloReceived.toString());
+                            
+                            System.out.println("-------------------Recv Hello -------------------");
+                            System.out.println("Hello: " + helloReceived.toString());
+                            System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+                            
                             RoutingTableEntry receivedTableEntry = new RoutingTableEntry(helloReceived.getMyAddress(), helloReceived.getMyFTSocket() , helloReceived.getMyUniqueID(), helloReceived.getAttributesList());
                             RoutingTable.getRoutingTableInstance().addRoute(receivedTableEntry);
                             System.out.println("\n\n\n\n\n\n" + RoutingTable.getRoutingTableInstance().getRoutes().toString() + "\n\n\n\n\n\n");
