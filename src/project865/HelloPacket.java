@@ -8,20 +8,20 @@ public class HelloPacket implements Serializable {
 	private String myUniqueID = null;
 	private String myAddress;
 	private int myFTSocket;
-        private ArrayList<AttributeTrio> attributesList;
+    private ArrayList<AttributeTrio> attributesList;
 
 	public static final int sendInterval = 10;
 	public static final int timeout = 3 * sendInterval;
 
-       /* Create Hello Packet
-        *
-        * @uniqueID - UniqueID of the sender
-        * @attributeTrio - encapsulates sender's resources lists. 
-                           {uniqueID, resources[], directly connected machines}
-        * @myAddress - IP address of the sender
-        * @myFTSocket - The socket to which iQuery messages should be sent to 
-                        potentially initialize file transfers
-        */
+   /* Create Hello Packet
+    *
+    * @uniqueID - UniqueID of the sender
+    * @attributeTrio - encapsulates sender's resources lists. 
+                       {uniqueID, resources[], directly connected machines}
+    * @myAddress - IP address of the sender
+    * @myFTSocket - The socket to which iQuery messages should be sent to 
+                    potentially initialize file transfers
+    */
 	public HelloPacket(String uniqueID, ArrayList<AttributeTrio> attributesList, String myAddress, int myFTSocket)
 	{	
 		this.myUniqueID = uniqueID;
@@ -31,7 +31,7 @@ public class HelloPacket implements Serializable {
 		this.myFTSocket = myFTSocket;
 	}
 	
-        @Override
+    @Override
 	public String toString()
 	{
 		StringBuilder sB = new StringBuilder("myUniqueID: " + getMyUniqueID() + "\n");
@@ -43,24 +43,24 @@ public class HelloPacket implements Serializable {
 		
 		for(AttributeTrio aTrio: getAttributesList())
 		{
-                    sB.append(aTrio.getUniqueID() + " ");
-                    for (Map.Entry<String, ArrayList<String>> s : aTrio.getHostResourceMap().entrySet())
-                    {
-                        sB.append("host: " + s.getKey() );
-                        for (String str : s.getValue())
-                        {
-                            sB.append(s + ",");
-                        }
-                         sB.deleteCharAt(sB.length() - 1); //delete last
-                         sB.append("\n");
-                    }
-                    
-                    sB.deleteCharAt(sB.length() - 1); //delete last ,
-                    sB.append("\nDirectly Connected Neighbours:\n");
-                    for (String s : aTrio.getDirectlyConnectedNeighbourUniqueIDs())
-                    {
-                        sB.append(s + ",");
-                    }
+            sB.append(aTrio.getUniqueID() + " ");
+            for (Map.Entry<String, ArrayList<String>> s : aTrio.getHostResourceMap().entrySet())
+            {
+                sB.append("host: " + s.getKey() );
+                for (String str : s.getValue())
+                {
+                    sB.append(s + ",");
+                }
+                 sB.deleteCharAt(sB.length() - 1); //delete last
+                 sB.append("\n");
+            }
+            
+            sB.deleteCharAt(sB.length() - 1); //delete last ,
+            sB.append("\nDirectly Connected Neighbours:\n");
+            for (String s : aTrio.getDirectlyConnectedNeighbourUniqueIDs())
+            {
+                sB.append(s + ",");
+            }
 		}
 		
 		return sB.toString();

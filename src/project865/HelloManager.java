@@ -32,7 +32,8 @@ public class HelloManager{
         
        
 	//public HelloManager(String uniqueID, ArrayList<InetAddress> targetIPs, Map<InetAddress, DatagramSocket> myIPSocketMap, String[] myResources) throws SocketException
-	public HelloManager(String uniqueID, HashMap<String,String> srcTargetIPMap, Map<InetAddress, DatagramSocket> myIPSocketMap, String[] myResources) throws SocketException
+	//public HelloManager(String uniqueID, HashMap<String,String> srcTargetIPMap, Map<InetAddress, DatagramSocket> myIPSocketMap, String[] myResources) throws SocketException
+    public HelloManager(String uniqueID, ArrayList<SourceTargetIPPair> stIPPairList, Map<InetAddress, DatagramSocket> myIPSocketMap, String[] myResources) throws SocketException
 	{
         //initialize default values that should not change
         this.myUniqueID = uniqueID;
@@ -45,13 +46,9 @@ public class HelloManager{
         
         //Add local information into routing table
         ArrayList<String> myDCNeighbours = new ArrayList<String>();
-        /*for (InetAddress iP: targetIPs)
+        for (SourceTargetIPPair ipPair : stIPPairList)
         {
-        	myDCNeighbours.add(iP.getHostAddress());
-        }*/
-        for (Map.Entry<String, String> en :srcTargetIPMap.entrySet())
-        {
-        	myDCNeighbours.add(en.getValue());
+        	myDCNeighbours.add(ipPair.getTargetIP());
         }
         final AttributeTrio myATrio = new AttributeTrio(this.myUniqueID, hrMap, myDCNeighbours);
         for (Map.Entry<InetAddress,DatagramSocket> sockMap : myIPSocketMap.entrySet())
@@ -61,7 +58,7 @@ public class HelloManager{
         
         //Attach a receiver to listen to the default hello port
         //myHSenderManager = new HelloSender(targetIPs, this.myUniqueID, this.myIPSocketMap);
-        myHSenderManager = new HelloSender(srcTargetIPMap, this.myUniqueID, this.myIPSocketMap);
+        myHSenderManager = new HelloSender(stIPPairList, this.myUniqueID, this.myIPSocketMap);
         //require single hello receiver for listening
         myHRecvManager = new HelloReceiver(new DatagramSocket(this.helloProtocolPort));
 
@@ -202,20 +199,21 @@ class HelloSender
 
     
     //public HelloSender(ArrayList<InetAddress> targetIPs, String myUniqueID, Map<InetAddress, DatagramSocket> myIPSocketMap) throws SocketException {
-    public HelloSender(HashMap<String,String> srcTargetIPMap, String myUniqueID, Map<InetAddress, DatagramSocket> myIPSocketMap) throws SocketException {
-
+    //public HelloSender(HashMap<String,String> srcTargetIPMap, String myUniqueID, Map<InetAddress, DatagramSocket> myIPSocketMap) throws SocketException {
+    
+    public HelloSender(ArrayList<SourceTargetIPPair> stIPPairList, String myUniqueID, Map<InetAddress, DatagramSocket> myIPSocketMap) throws SocketException {
+    
         int iQueryPort = 0;
         String queryIP = null;
-        scheduler = Executors.newScheduledThreadPool(srcTargetIPMap.size() + 1);
+        scheduler = Executors.newScheduledThreadPool(stIPPairList.size() + 1);
                
-        //for (InetAddress t : targetIPs)
-        for (Map.Entry<String, String> t :srcTargetIPMap.entrySet())
+        for (SourceTargetIPPair t :stIPPairList)
         {
             for (Map.Entry<InetAddress,DatagramSocket> sockMap : myIPSocketMap.entrySet())
             {
                 //If currect socket map's ip is part of the same network as the target ip, set iQuert port
                 //if (App.getNetwork(sockMap.getKey().getHostAddress()).equals(App.getNetwork(t.getHostAddress())))
-            	if (sockMap.getKey().getHostAddress().equals(t.getKey()))
+            	if (sockMap.getKey().getHostAddress().equals(t.getSourceIP()))
                 {
                     iQueryPort = sockMap.getValue().getLocalPort();
                     queryIP = sockMap.getKey().getHostAddress();
@@ -230,9 +228,9 @@ class HelloSender
             else
             {
                 try {
-					hSendList.add(hSendRunnable(InetAddress.getByName(t.getValue()), new DatagramSocket(), myUniqueID, queryIP, iQueryPort));
+					hSendList.add(hSendRunnable(InetAddress.getByName(t.getTargetIP()), new DatagramSocket(), myUniqueID, queryIP, iQueryPort));
 				} catch (UnknownHostException e) {
-					System.out.println("Unknown host " + t.getValue());
+					System.out.println("Unknown host " + t.getTargetIP());
 					e.printStackTrace();
 				}
                 queryIP = null;
@@ -241,7 +239,7 @@ class HelloSender
             
         }
         //TODO remove debug message at later date
-        System.out.println("I have " + srcTargetIPMap.size() + " targets");
+        System.out.println("I have " + stIPPairList.size() + " targets");
     }
 
     public void startHSenderThreads()
@@ -280,6 +278,7 @@ class HelloReceiver {
                             System.out.println(helloReceived.toString());
                             RoutingTableEntry receivedTableEntry = new RoutingTableEntry(helloReceived.getMyAddress(), helloReceived.getMyFTSocket() , helloReceived.getMyUniqueID(), helloReceived.getAttributesList());
                             RoutingTable.getRoutingTableInstance().addRoute(receivedTableEntry);
+                            System.out.println("\n\n\n\n\n\n" + RoutingTable.getRoutingTableInstance().getRoutes().toString() + "\n\n\n\n\n\n");
                         } catch (ClassNotFoundException ex) {
                              ex.printStackTrace();
                             // Logger.getLogger(HelloReceiver.class.getName()).log(Level.SEVERE, null, ex);
