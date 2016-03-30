@@ -4,34 +4,30 @@
  */
 package project865;
 
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.Socket;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 public class RoutingTableEntry {
 
-    private String nextHop;
+    private String nextHopIP;
     private int nextHopSocket;
     private String uniqueID;
     private ArrayList<AttributeTrio> attributesList = new ArrayList<AttributeTrio>();
 
     public RoutingTableEntry(String nextHop, int nextHopSocket, String uniqueID, ArrayList<AttributeTrio> nRMap) {
-            this.nextHop = nextHop;
+            this.nextHopIP = nextHop;
             this.nextHopSocket = nextHopSocket;
             this.uniqueID = uniqueID;
             this.attributesList = nRMap;
-             System.out.println("Created Routing Table entry nextHop: " + this.nextHop + " nH socket: " + this.nextHopSocket + " UID :"+this.uniqueID );
+             System.out.println("Created Routing Table entry nextHop: " + this.nextHopIP + " nH socket: " + this.nextHopSocket + " UID :"+this.uniqueID );
     }
 
     public String getNextHop() {
-            return nextHop;
+            return nextHopIP;
     }
 
     public void setNextHop(String nextHop) {
-            this.nextHop = nextHop;
+            this.nextHopIP = nextHop;
     }
 
     public int getNextHopSocket() {
@@ -76,7 +72,7 @@ public class RoutingTableEntry {
 
     @Override
     public String toString() {
-        return "RoutingTableEntry{" + "nextHop=" + nextHop + ", nextHopSocket=" + nextHopSocket + ", uniqueID="
+        return "RoutingTableEntry{" + "nextHop=" + nextHopIP + ", nextHopSocket=" + nextHopSocket + ", uniqueID="
                         + uniqueID + ", neighbourAndResource=" + this.getAttributesList().toString() + '}';
     }
 }

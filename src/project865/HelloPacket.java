@@ -49,7 +49,7 @@ public class HelloPacket implements Serializable {
                         sB.append("host: " + s.getKey() );
                         for (String str : s.getValue())
                         {
-                            sB.append("s,");
+                            sB.append(s + ",");
                         }
                          sB.deleteCharAt(sB.length() - 1); //delete last
                          sB.append("\n");

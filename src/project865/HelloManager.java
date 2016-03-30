@@ -98,7 +98,6 @@ public class HelloManager{
 	
 	public static void sendHelloPacket(int port, String targetIp, HelloPacket helloPacket)
 	{
-        byte[] buffer = new byte[65508];
 		ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
 		ObjectOutput hPacket = null;
 		
@@ -179,7 +178,7 @@ class HelloSender
         {
             public void run()
             {
-                System.out.println("sending to " + targetIPAddr.getHostAddress() + " on local port " + targetSocket.getLocalPort() + " my ip is " + targetIPAddr.getHostAddress());
+                System.out.println("sending to " + targetIPAddr.getHostAddress() + " on local port " + targetSocket.getLocalPort() + " my ip is " + targetSocket.getLocalAddress().getHostAddress());
                               
                 //in  actuality we are going to send our entire routing table's resource map
                 //for testing 
