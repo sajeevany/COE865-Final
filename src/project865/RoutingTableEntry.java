@@ -5,9 +5,13 @@
 package project865;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class RoutingTableEntry {
 
@@ -22,11 +26,33 @@ public class RoutingTableEntry {
             this.uniqueID = uniqueID;
             
             // Remove any duplicates            
-            Set<AttributeTrio> attributeSet = new LinkedHashSet<AttributeTrio>(nRMap);
-            this.attributesList.addAll(attributeSet);
+            /*Set<AttributeTrio> attributeSet = new LinkedHashSet<AttributeTrio>(nRMap);
+            this.attributesList.addAll(attributeSet);*/
+            this.attributesList = removeDuplicates(nRMap);
             System.out.println("Created Routing Table entry nextHop: " + this.nextHopIP + " nH socket: " + this.nextHopSocket + " UID :"+this.uniqueID );
     }
 
+    //@author Riccardo Cossu
+    public ArrayList<AttributeTrio> removeDuplicates(ArrayList<AttributeTrio> tr) {
+        // ... the list is already populated
+        Set<AttributeTrio> s = new TreeSet<AttributeTrio>(new Comparator<AttributeTrio>() {
+
+            @Override
+            public int compare(AttributeTrio o1, AttributeTrio o2) {
+                
+            	if (o1.getUniqueID().equals(o2.getUniqueID()))
+            		return 1;
+            	else
+            		return 0;
+            }
+        });
+        s.addAll(tr);
+        ArrayList<AttributeTrio> atr = new ArrayList<AttributeTrio>();
+        atr.addAll(s);
+        //List<AttributeTrio> res = Arrays.asList(s.toArray());
+        return atr;
+    }
+    
     public String getNextHop() {
             return nextHopIP;
     }
