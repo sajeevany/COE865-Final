@@ -1,6 +1,7 @@
 package project865;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class RoutingTable {
 
@@ -66,4 +67,24 @@ public class RoutingTable {
         return null;
     }
     
+    /*
+     * Returns a Hashmap of groupings in which the key is the host's uniqueID and the value is the 
+     * list of directly connected neighbours
+     * 
+     */
+    public HashMap<String, ArrayList<String>> getDCNeighboursMap()
+    {
+    	
+    	return null;
+    }
+    
+    
+    /*
+     * Returns list of all possible resources as per the routing tbale
+     */
+    public ArrayList<String> getNetResourceList()
+    {
+    	
+    	return null;
+    }
 }
