@@ -14,6 +14,7 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.ScheduledExecutorService;
 
 
 public class QueryManager{
@@ -23,7 +24,7 @@ public class QueryManager{
 	private int[] mySockets = null;
 	private String[] myResourceList = null;
 	private HelloSender myHSenderManager = null;
-	private  QueryReceiver myQRecvManager = null;
+	private  ArrayList<QueryReceiver> myQRecvReceiver = new ArrayList<QueryReceiver>();;
 	private ArrayList<QueryReceiver> qReceiver = new ArrayList<QueryReceiver>();
 	private Runnable qSender;
 	
@@ -35,15 +36,14 @@ public class QueryManager{
 		this.myResourceList= myResourceList;
 		
         //query receiver for listening for queries
-		 for (int i = 0; i < myIPs.length; i++)
-	     {
-	      
-	        	 try {
-					myQRecvManager = new QueryReceiver(new DatagramSocket(mySockets[i]));
-				} catch (SocketException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+            for (int i = 0; i < myIPs.length; i++)
+            {
+                try {
+                       myQRecvReceiver.add(new QueryReceiver(new DatagramSocket(mySockets[i])));
+                } catch (SocketException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                }
 	     } 
 		 
 
@@ -51,10 +51,15 @@ public class QueryManager{
 	
 	//start hello receiver and sender threads
 	public void runManager()
-	{
-		 
-        myQRecvManager.startQRecvThread();
-       
+	{          
+            System.out.println("SENDING QUERY");
+	            	QueryPacket sendToKrish = new QueryPacket("R1", "R3", true, "r3File.txt", false);
+               QueryManager.sendQueryPacket(10903, "10.1.1.11", sendToKrish);
+	
+               for (QueryReceiver qRec :myQRecvReceiver)
+               {
+                   qRec.startQRecvThread();
+               }
 	}
 	
 	public static void sendQueryPacket(int port, String targetIp, QueryPacket queryPacket)
@@ -110,9 +115,9 @@ public class QueryManager{
 	                {
 	                    netResourceList.addAll(route.getAttributesList());
 	                }
-	            	
+                        
 	                System.out.println("listening on local port " + localSocket.getLocalPort() + "For Queries");
-
+                            
 	                while (true) {
 	                    packet.setLength(65508);
 	                    try {
