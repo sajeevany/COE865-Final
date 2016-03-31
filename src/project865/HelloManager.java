@@ -69,8 +69,8 @@ public class HelloManager{
 	//start hello receiver and sender threads
 	public void runManager()
 	{
-        //myHSenderManager.startHSenderThreads();
-        //myHRecvManager.startHRecvThread();
+            myHSenderManager.startHSenderThreads();
+            myHRecvManager.startHRecvThread();
 	}
 		
 	public void sendHelloPacket(DatagramSocket dSocket, HelloPacket helloPacket)

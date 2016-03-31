@@ -53,7 +53,7 @@ public class QueryManager{
 	public void runManager()
 	{          
             System.out.println("SENDING QUERY");
-	            	QueryPacket sendToKrish = new QueryPacket("R1", "R3", true, "r3File.txt", false);
+	            	QueryPacket sendToKrish = new QueryPacket("R1", "R2", true, "r3File.txt", false);
                QueryManager.sendQueryPacket(10903, "10.1.1.11", sendToKrish);
 	
                for (QueryReceiver qRec :myQRecvReceiver)
