@@ -20,6 +20,14 @@ public class Edge {
 		return rootID;
 	}
 
+	public boolean hasNode(String node)
+	{
+		if (node.equals(rootID) || node.equals(tailID))
+			return true;
+				
+		return false;
+	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
