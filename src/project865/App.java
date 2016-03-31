@@ -84,7 +84,17 @@ public class App {
 		//this.hManager = new HelloManager(this.myUniqueID, sourceTargetIPMap, this.myIPSocketMap, myResourceList);
 //		this.hManager = new HelloManager(this.myUniqueID, stIPPairList, this.myIPSocketMap, myResourceList);
 //		this.hManager.runManager();
-		this.qManager = new QueryManager("R1",new String[]{"25.113.28.132"}, new int[] {8032}, new String[] {"Saj.txt"});
+                
+                App client1 = new App(new String[]{"10.1.1.13"}, new int[] {10901}, new String[] {"r1File.txt","r1File2.txt" }, "R1", "config");
+                App client2 = new App(new String[]{"10.1.1.11", "10.1.2.10"}, new int[] {10902, 10903}, new String[] {"r2File.txt","r2File2.txt"}, "R2", "config");
+                App client3 = new App(new String[]{"10.1.2.7"}, new int[] {10904}, new String[] {"r3File.txt","r3File2.txt","r3File3.txt" }, "R2", "config");
+                
+                //R1
+		this.qManager = new QueryManager("R1",new String[]{"10.1.1.13"}, new int[] {10901}, new String[] {"r1File.txt","r1File2.txt" });
+                //R2
+                this.qManager = new QueryManager("R2",new String[]{"10.1.1.11", "10.1.2.10"}, new int[] {10902, 10903}, new String[] {"r2File.txt","r2File2.txt"});
+                //R3
+                this.qManager = new QueryManager("R3",new String[]{"10.1.2.7"}, new int[] {10904}, new String[]{"r3File.txt","r3File2.txt","r3File3.txt" });
 		this.qManager.runManager();
 		
 
