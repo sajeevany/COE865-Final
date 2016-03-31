@@ -47,6 +47,25 @@ public class QueryPacket implements Serializable {
 		return requestResult;
 	}
 	
+	 @Override
+		public String toString()
+		{
+			StringBuilder sB = new StringBuilder("myUniqueID: " + getMyUniqueID() + "\n");
+			
+			sB.append("Destination" + ": "  + getMyDestinationID() + "\n");
+			sB.append("isRequest" + ": "  + isRequest() + "\n");
+			sB.append("FileName" + ": "  + getRequestedFileName() + "\n");
+			sB.append("isResultRequest" + ": "  + isRequestResult() + "\n");
+			
+					
+			sB.append("\nResource List:\n");
+			
+			
+			return sB.toString();
+		}
+	
+	
+	
     
 
 }
