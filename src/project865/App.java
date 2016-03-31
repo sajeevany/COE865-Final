@@ -21,22 +21,13 @@ public class App {
 	private String myUniqueID = null;
 	private String resourceNames[];
 	private HelloManager hManager;
-	private Map<InetAddress, DatagramSocket> myIPSocketMap = new HashMap<InetAddress, DatagramSocket>();
+	private QueryManager qManager;
+	private Map<String, Integer> myIPSocketMap = new HashMap<String, Integer>();
 	private ArrayList<InetAddress> targetMachineIPs = new ArrayList<InetAddress>();
 
 	public App(String[] myIPs, int[] myQuerySockets, String[] myResourceList, String uniqueID, String configFileName) throws IOException {
-		try {
-
-	        for (int i = 0; i < myQuerySockets.length; i++) {
-	                myIPSocketMap.put(InetAddress.getByName(myIPs[i]), new DatagramSocket(myQuerySockets[i]));
-	        }
-
-		} catch (SocketException e) {
-
-			e.printStackTrace();
-
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
+		for (int i = 0; i < myQuerySockets.length; i++) {
+			myIPSocketMap.put(myIPs[i], myQuerySockets[i]);
 		}
 
 		this.myUniqueID = uniqueID;
@@ -93,13 +84,15 @@ public class App {
 		//this.hManager = new HelloManager(this.myUniqueID, sourceTargetIPMap, this.myIPSocketMap, myResourceList);
 		this.hManager = new HelloManager(this.myUniqueID, stIPPairList, this.myIPSocketMap, myResourceList);
 		this.hManager.runManager();
+		this.qManager = new QueryManager("R1",new String[]{"25.113.28.132"}, new int[] {8032}, new String[] {"Saj.txt"});
+		this.qManager.runManager();
 		
 
 	}
 		
 	public static void main(String[] args) throws IOException {
 		
-		App client1 = new App(new String[]{"25.113.28.132"}, new int[] {8005}, new String[] {"Arjun.txt"}, "R5", "config");
+		App client1 = new App(new String[]{"25.24.30.123", "25.24.30.123"}, new int[] {23245, 11111}, new String[] {"sajPC.txt", "candy.png"}, "R2", "config");
 		
 	}
 

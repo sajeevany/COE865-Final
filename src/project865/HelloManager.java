@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 public class HelloManager{
 	
     private String myUniqueID = null;
-    private Map<InetAddress, DatagramSocket> myIPSocketMap = null;
+    private Map<String, Integer> myIPSocketMap = null;
     public static final int helloProtocolPort = 10090;
     private ArrayList<InetAddress> targetIPs;      
     private ArrayList<HelloReceiver> hReceiver = new ArrayList<HelloReceiver>();
@@ -33,7 +33,7 @@ public class HelloManager{
        
 	//public HelloManager(String uniqueID, ArrayList<InetAddress> targetIPs, Map<InetAddress, DatagramSocket> myIPSocketMap, String[] myResources) throws SocketException
 	//public HelloManager(String uniqueID, HashMap<String,String> srcTargetIPMap, Map<InetAddress, DatagramSocket> myIPSocketMap, String[] myResources) throws SocketException
-    public HelloManager(String uniqueID, ArrayList<SourceTargetIPPair> stIPPairList, Map<InetAddress, DatagramSocket> myIPSocketMap, String[] myResources) throws SocketException
+    public HelloManager(String uniqueID, ArrayList<SourceTargetIPPair> stIPPairList, Map<String, Integer> myIPSocketMap, String[] myResources) throws SocketException
 	{
         //initialize default values that should not change
         this.myUniqueID = uniqueID;
@@ -51,9 +51,9 @@ public class HelloManager{
         	myDCNeighbours.add(ipPair.getTargetIP());
         }
         final AttributeTrio myATrio = new AttributeTrio(this.myUniqueID, hrMap, myDCNeighbours);
-        for (Map.Entry<InetAddress,DatagramSocket> sockMap : myIPSocketMap.entrySet())
+        for (Map.Entry<String, Integer> sockMap : myIPSocketMap.entrySet())
         {
-            RoutingTable.getRoutingTableInstance().addRoute(new RoutingTableEntry(sockMap.getKey().getHostAddress(), sockMap.getValue().getLocalPort(), uniqueID, new ArrayList<AttributeTrio>(){{add(myATrio);}} ));
+            RoutingTable.getRoutingTableInstance().addRoute(new RoutingTableEntry(sockMap.getKey(), sockMap.getValue(), uniqueID, new ArrayList<AttributeTrio>(){{add(myATrio);}} ));
         }
         
         //Attach a receiver to listen to the default hello port
@@ -69,8 +69,8 @@ public class HelloManager{
 	//start hello receiver and sender threads
 	public void runManager()
 	{
-        myHSenderManager.startHSenderThreads();
-        myHRecvManager.startHRecvThread();
+        //myHSenderManager.startHSenderThreads();
+        //myHRecvManager.startHRecvThread();
 	}
 		
 	public void sendHelloPacket(DatagramSocket dSocket, HelloPacket helloPacket)
@@ -202,7 +202,7 @@ class HelloSender
         return hSend;
     };
     
-    public HelloSender(ArrayList<SourceTargetIPPair> stIPPairList, String myUniqueID, Map<InetAddress, DatagramSocket> myIPSocketMap) throws SocketException {
+    public HelloSender(ArrayList<SourceTargetIPPair> stIPPairList, String myUniqueID, Map<String, Integer> myIPSocketMap) throws SocketException {
     
         int iQueryPort = 0;
         String queryIP = null;
@@ -210,14 +210,14 @@ class HelloSender
                
         for (SourceTargetIPPair t :stIPPairList)
         {
-            for (Map.Entry<InetAddress,DatagramSocket> sockMap : myIPSocketMap.entrySet())
+            for (Map.Entry<String, Integer> sockMap : myIPSocketMap.entrySet())
             {
                 //If currect socket map's ip is part of the same network as the target ip, set iQuert port
                 //if (App.getNetwork(sockMap.getKey().getHostAddress()).equals(App.getNetwork(t.getHostAddress())))
-            	if (sockMap.getKey().getHostAddress().equals(t.getSourceIP()))
+            	if (sockMap.getKey().equals(t.getSourceIP()))
                 {
-                    iQueryPort = sockMap.getValue().getLocalPort();
-                    queryIP = sockMap.getKey().getHostAddress();
+                    iQueryPort = sockMap.getValue();
+                    queryIP = sockMap.getKey();
                     break;
                 }
             }
