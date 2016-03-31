@@ -14,11 +14,7 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+
 
 public class QueryManager{
 	
@@ -104,8 +100,8 @@ public class QueryManager{
 	    private Runnable qRecvRunnable(final DatagramSocket localSocket) {
 	        Runnable qRecv = new Runnable() {
 	        	
-	        	 ArrayList<RoutingTableEntry> routeList = RoutingTable.getRoutingTableInstance().getRoutes();
-	             ArrayList<AttributeTrio> netResourceList = new ArrayList<AttributeTrio>();
+                    ArrayList<RoutingTableEntry> routeList = RoutingTable.getRoutingTableInstance().getRoutes();
+	            ArrayList<AttributeTrio> netResourceList = new ArrayList<AttributeTrio>();
 	             
 	               
 	            @Override
@@ -125,7 +121,7 @@ public class QueryManager{
 	                        ObjectInputStream oos = new ObjectInputStream(baos);
 	                        QueryPacket queryReceived;
 	                        try {
-	                        	queryReceived = (QueryPacket) oos.readObject();
+                                    queryReceived = (QueryPacket) oos.readObject();
 	                            System.out.println(queryReceived.toString());
 	                            
 	                            System.out.println("-------------------Recv Query -------------------");

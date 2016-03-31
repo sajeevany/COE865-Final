@@ -82,8 +82,8 @@ public class App {
 		
 		//Set<SourceTargetIPPair> stSet = new LinkedHashSet<SourceTargetIPPair>();
 		//this.hManager = new HelloManager(this.myUniqueID, sourceTargetIPMap, this.myIPSocketMap, myResourceList);
-		this.hManager = new HelloManager(this.myUniqueID, stIPPairList, this.myIPSocketMap, myResourceList);
-		this.hManager.runManager();
+//		this.hManager = new HelloManager(this.myUniqueID, stIPPairList, this.myIPSocketMap, myResourceList);
+//		this.hManager.runManager();
 		this.qManager = new QueryManager("R1",new String[]{"25.113.28.132"}, new int[] {8032}, new String[] {"Saj.txt"});
 		this.qManager.runManager();
 		
@@ -91,9 +91,59 @@ public class App {
 	}
 		
 	public static void main(String[] args) throws IOException {
+	
+                String whoami = "R1";
+            
+                HashMap<String, ArrayList<String>> hostResourceMap = new HashMap<String, ArrayList<String>>();
+                hostResourceMap.put("R1", new ArrayList<String>(){{add("r1File.txt"); add("r1File2.txt");}});
+                hostResourceMap.put("R2", new ArrayList<String>(){{add("r2File.txt"); add("r2File2.txt");}});
+                hostResourceMap.put("R3", new ArrayList<String>(){{add("r3File.txt"); add("r3File2.txt"); add("r3File3.txt");}});
+                        
+                ArrayList<AttributeTrio> rte1Tr = new ArrayList<AttributeTrio>();
+                AttributeTrio atr1 = new AttributeTrio("R1", hostResourceMap, new ArrayList<String>(){{add("R2");}});
+                AttributeTrio atr2 = new AttributeTrio("R2", hostResourceMap, new ArrayList<String>(){{add("R1"); add("R2");}});
+                AttributeTrio atr3 = new AttributeTrio("R3", hostResourceMap, new ArrayList<String>(){{add("R2");}});
+                rte1Tr.add(atr1);
+                rte1Tr.add(atr2);
+                rte1Tr.add(atr3);
+                
+                //R1
+                //{who data is from, port to sendIQueryRequestsTo, what their uniqueID is}
+                RoutingTableEntry rte1 = new RoutingTableEntry("10.1.1.13", 10901, "R1", rte1Tr); //local data
+                RoutingTableEntry rte2 = new RoutingTableEntry("10.1.1.11", 10902, "R1", rte1Tr);
+                
+                //R2
+                RoutingTableEntry rte3 = new RoutingTableEntry("10.1.1.11", 10902, "R2", rte1Tr); //local data
+                RoutingTableEntry rte4 = new RoutingTableEntry("10.1.1.13", 10901, "R1", rte1Tr);
+                RoutingTableEntry rte5 = new RoutingTableEntry("10.1.1.10", 10903, "R2", rte1Tr); //local data
+                RoutingTableEntry rte6 = new RoutingTableEntry("10.1.2.7" , 10901, "R2", rte1Tr);
+                
+                //R3
+                RoutingTableEntry rte7 = new RoutingTableEntry("10.1.2.7" , 10904, "R3", rte1Tr); //local data
+                RoutingTableEntry rte8 = new RoutingTableEntry("10.1.1.10", 10903, "R2", rte1Tr);
 		
-		App client1 = new App(new String[]{"25.24.30.123", "25.24.30.123"}, new int[] {23245, 11111}, new String[] {"sajPC.txt", "candy.png"}, "R2", "config");
-		
+                if (whoami.toUpperCase().equals("R1"))
+                {
+                    RoutingTable.getRoutingTableInstance().addRoute(rte1);
+                    RoutingTable.getRoutingTableInstance().addRoute(rte2);
+                }
+                else if (whoami.toUpperCase().equals("R2"))
+                {
+                    RoutingTable.getRoutingTableInstance().addRoute(rte3);
+                    RoutingTable.getRoutingTableInstance().addRoute(rte4);
+                    RoutingTable.getRoutingTableInstance().addRoute(rte5);
+                    RoutingTable.getRoutingTableInstance().addRoute(rte6);
+                }
+                else
+                {
+                    RoutingTable.getRoutingTableInstance().addRoute(rte7);
+                    RoutingTable.getRoutingTableInstance().addRoute(rte8);
+                }
+                
+                App client1 = new App(new String[]{"10.1.1.13"}, new int[] {10901}, new String[] {"r1File.txt","r1File2.txt" }, "R1", "config");
+                App client2 = new App(new String[]{"10.1.1.11", "10.1.2.10"}, new int[] {10902, 10903}, new String[] {"r2File.txt","r2File2.txt"}, "R2", "config");
+                App client3 = new App(new String[]{"10.1.2.7"}, new int[] {10904}, new String[] {"r3File.txt","r3File2.txt","r3File3.txt" }, "R2", "config");
+                
 	}
 
 	public static String getNetwork(String IP)
